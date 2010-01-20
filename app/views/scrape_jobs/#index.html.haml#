@@ -1,0 +1,20 @@
+%h1 Listing scrape_jobs
+
+%table
+  %tr
+    %th Name
+    %th Uri
+    %th Pdftotext layout
+  - @scrape_jobs.each do |scrape_job|
+    %tr
+      %td= h scrape_job.name
+      %td= h scrape_job.uri
+      %td= h scrape_job.pdftotext_layout
+        
+      %td= link_to 'Show', object_url(scrape_job)
+      %td= link_to 'Edit', edit_object_url(scrape_job)
+      %td= link_to 'Destroy', object_url(scrape_job), :confirm => 'Are you sure?', :method => :delete
+
+%br/
+
+=link_to 'New scrape_job', new_object_url

@@ -6,3 +6,4 @@ config/database.yml
 .DS_Store
 doc
 log
+rerun.txt

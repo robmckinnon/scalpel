@@ -1,0 +1,10 @@
+one:
+  id: 1
+  name: MyString
+  uri: MyText
+  pdftotext_layout: false
+two:
+  id: 2
+  name: MyString
+  uri: MyText
+  pdftotext_layout: false

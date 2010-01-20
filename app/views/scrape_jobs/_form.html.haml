@@ -1,0 +1,9 @@
+%p
+  %label{:for => "scrape_job_name"} Name:
+  = f.text_field :name
+%p
+  %label{:for => "scrape_job_uri"} Uri:
+  = f.text_area :uri
+%p
+  %label{:for => "scrape_job_pdftotext_layout"} Pdftotext layout:
+  = f.check_box :pdftotext_layout

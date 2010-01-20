@@ -1,0 +1,13 @@
+%p
+  %strong Name:
+  =h @scrape_job.name
+%p
+  %strong Uri:
+  =h @scrape_job.uri
+%p
+  %strong Pdftotext layout:
+  =h @scrape_job.pdftotext_layout
+
+= link_to 'Edit', edit_object_url
+|
+= link_to 'Back', collection_url

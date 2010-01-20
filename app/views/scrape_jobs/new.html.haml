@@ -1,0 +1,9 @@
+%h1 New scrape_job
+
+= error_messages_for :scrape_job
+
+- form_for(:scrape_job, :url => collection_url) do |f|
+  = render :partial => "form", :locals => { :f => f }
+  %p= submit_tag "Create"
+
+= link_to 'Back', collection_url
