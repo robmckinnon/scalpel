@@ -5,12 +5,12 @@ class ScrapeRunsController < ActionController::Base
 
   def new
     @scrape_run = @job.scrape_runs.create
+    @scrape_run.start_run
     redirect_to :controller => :scrape_jobs, :action => :show, :id => @scrape_job_id
   end
   
   def update
     scrape_run = @job.scrape_runs.find(params[:id])
-
     if scrape_run.update_attributes params[:scrape_run]
       render :status => '200', :text => ''
     else

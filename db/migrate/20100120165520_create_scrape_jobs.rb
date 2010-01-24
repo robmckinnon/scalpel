@@ -3,6 +3,8 @@ class CreateScrapeJobs < ActiveRecord::Migration
     create_table :scrape_jobs, :force => true do |t|
       t.string :name
       t.text :uri
+      t.string :last_modified
+      t.string :etag
       t.boolean :pdftotext_layout
 
       t.timestamps

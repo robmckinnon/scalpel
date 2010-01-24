@@ -27,6 +27,8 @@ ActiveRecord::Schema.define(:version => 20100123115650) do
   create_table "scrape_jobs", :force => true do |t|
     t.string   "name"
     t.text     "uri"
+    t.string   "last_modified"
+    t.string   "etag"
     t.boolean  "pdftotext_layout"
     t.datetime "created_at"
     t.datetime "updated_at"

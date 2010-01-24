@@ -1,25 +1,23 @@
-require 'em-http' # used for http requests via deferred callbacks 
 require 'uri'
 require 'fileutils'
 require 'rest_client'
 
 class ScrapeRunJob
   
-  def initialize uri, scrape_job_id, scrape_run_id
-    @uri, @scrape_job_id, @scrape_run_id = uri, scrape_job_id, scrape_run_id
+  def initialize uri, scrape_job_id, scrape_run_id, etag, last_modified
+    @uri, @scrape_job_id, @scrape_run_id, @etag, @last_modified = uri, scrape_job_id, scrape_run_id, etag, last_modified
   end
 
   def perform
-    EventMachine.run do
-      http = EventMachine::HttpRequest.new(@uri, :head => {}).get :timeout => 10
-      http.callback do
-        http_callback http, @uri
-        EventMachine.stop
-      end
-      http.errback do
-        http_errback http, @uri
-        EventMachine.stop
-      end
+    options = {}
+    options.merge!({'If-None-Match' => @etag}) if @etag
+    options.merge!({'If-Modified-Since' => @last_modified}) if @last_modified
+      
+    begin
+      response = RestClient.get @uri, options 
+      http_callback response, @uri
+    rescue Exception => e
+      http_errback e, @uri
     end
   end
 
@@ -45,36 +43,44 @@ class ScrapeRunJob
     def pdftotext file
       `pdftotext -layout #{file}`
     end
+
+    def update_scrape_run data
+      begin
+        resource_uri = "http://localhost:3000/scrape_jobs/#{@scrape_job_id}/scrape_runs/#{@scrape_run_id}"      
+        resource = RestClient::Resource.new resource_uri
+        resource.put data
+      rescue Exception => e
+        puts e.to_s
+      end
+    end
     
-    def http_callback http, uri
+    def http_callback response, uri      
       file = uri_file_name(uri)
-      write_file file, http.response
-      
-      header = http.response_header
-      content_type = header['CONTENT_TYPE']
-      
-      pdftotext file if content_type == 'application/pdf'
+      write_file file, response.to_s
+
+      header = response.headers
+      pdftotext file if header[:content_type] == 'application/pdf'
 
       data = {
-        'scrape_run[response_code]' => header.status,
-        'scrape_run[last_modified]' => header['LAST_MODIFIED'],
-        'scrape_run[etag]' => header['ETAG'],
-        'scrape_run[content_type]' => content_type,
-        'scrape_run[content_length]' => header['CONTENT_LENGTH'],
-        'scrape_run[response_header]' => header.inspect,
+        'scrape_run[response_code]' => response.code,
+        'scrape_run[last_modified]' => header[:last_modified],
+        'scrape_run[etag]' => header[:etag],
+        'scrape_run[content_type]' => header[:content_type],
+        'scrape_run[content_length]' => header[:content_length],
+        'scrape_run[response_header]' => response.raw_headers.inspect,
         'scrape_run[uri]' => uri,
         'scrape_run[file_path]' => file
       }
       write_file file_name('data.yml'), data.to_yaml
-      
-      resource_uri = "http://localhost:3000/scrape_jobs/#{@scrape_job_id}/scrape_runs/#{@scrape_run_id}"
-      write_file file_name('resource_uri'), resource_uri
-      resource = RestClient::Resource.new resource_uri
-      resource.put data
+      update_scrape_run data
     end
 
-    def http_errback http, uri
-      puts "#{uri}\n" + http.errors     
-      EventMachine.stop
+    def http_errback e, uri
+      if e.is_a?(RestClient::Exception)
+        data = { 'scrape_run[response_code]' => e.http_code }
+        update_scrape_run data
+      else
+        puts "#{uri}\n" + e.to_s     
+      end
     end
 end
