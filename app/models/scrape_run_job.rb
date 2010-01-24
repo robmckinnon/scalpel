@@ -42,16 +42,24 @@ class ScrapeRunJob
       end      
     end
 
+    def pdftotext file
+      `pdftotext -layout #{file}`
+    end
+    
     def http_callback http, uri
       file = uri_file_name(uri)
       write_file file, http.response
-      header = http.response_header
       
+      header = http.response_header
+      content_type = header['CONTENT_TYPE']
+      
+      pdftotext file if content_type == 'application/pdf'
+
       data = {
         'scrape_run[response_code]' => header.status,
         'scrape_run[last_modified]' => header['LAST_MODIFIED'],
         'scrape_run[etag]' => header['ETAG'],
-        'scrape_run[content_type]' => header['CONTENT_TYPE'],
+        'scrape_run[content_type]' => content_type,
         'scrape_run[content_length]' => header['CONTENT_LENGTH'],
         'scrape_run[response_header]' => header.inspect,
         'scrape_run[uri]' => uri,
