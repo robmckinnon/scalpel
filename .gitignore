@@ -7,3 +7,4 @@ config/database.yml
 doc
 log
 rerun.txt
+data

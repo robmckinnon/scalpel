@@ -1,5 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :scrape_jobs
+
+  map.resources :scrape_jobs, :has_many => :scrape_runs
 
   # The priority is based upon order of creation: first created -> highest priority.
 

@@ -8,6 +8,7 @@ describe "/scrape_jobs/show.html.haml" do
     @scrape_job.stub!(:name).and_return("MyString")
     @scrape_job.stub!(:uri).and_return("MyText")
     @scrape_job.stub!(:pdftotext_layout).and_return(false)
+    @scrape_job.stub!(:scrape_runs).and_return []
 
     assigns[:scrape_job] = @scrape_job
 

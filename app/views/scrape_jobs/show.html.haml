@@ -8,6 +8,46 @@
   %strong Pdftotext layout:
   =h @scrape_job.pdftotext_layout
 
+= link_to "Scrape now", new_scrape_job_scrape_run_url(@scrape_job)
+
+- unless @scrape_job.scrape_runs.empty?
+  %table
+    %thead
+      %tr
+        %th
+          Response
+          %br
+          code
+        %th
+          Last
+          %br
+          modified
+        %th Etag
+        %th
+          Content
+          %br
+          type
+        %th
+          Content
+          %br
+          length
+        - if false
+          %th
+            Response 
+            %br
+            header
+        %th Uri
+        %th 
+          File
+          %br
+          path
+        %th
+          Git
+          %br
+          path
+    %tbody      
+      = render :partial => "/scrape_runs/scrape_run" , :collection => @scrape_job.scrape_runs.reverse
+
 = link_to 'Edit', edit_object_url
 |
 = link_to 'Back', collection_url

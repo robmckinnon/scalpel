@@ -13,6 +13,9 @@ gem "haml"
 gem "friendly_id"
 gem "resource_controller"
 gem "mysql"
+gem "em-http-request"
+gem "delayed_job"
+gem "rest-client"
 
 only :test do
   gem "rspec"

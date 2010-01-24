@@ -1,0 +1,22 @@
+one:
+  id: 1
+  response_code: 1
+  last_modified: MyString
+  etag: MyString
+  content_type: MyString
+  content_length: 1
+  response_header: MyText
+  uri: MyText
+  file_path: MyText
+  git_path: MyText
+two:
+  id: 2
+  response_code: 1
+  last_modified: MyString
+  etag: MyString
+  content_type: MyString
+  content_length: 1
+  response_header: MyText
+  uri: MyText
+  file_path: MyText
+  git_path: MyText
