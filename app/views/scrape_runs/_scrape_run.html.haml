@@ -6,8 +6,9 @@
   %td=h scrape_run.etag
   %td=h scrape_run.content_type
   %td=h scrape_run.content_length
-  -if false
-    %td=h scrape_run.response_header
   %td=h scrape_run.uri
   %td=h scrape_run.file_path
   %td=h scrape_run.git_path
+  %td=h scrape_run.response_header ? eval(scrape_run.response_header).to_yaml : scrape_run.response_header
+  - if false
+    %td=h scrape_run.response_header ? eval(scrape_run.response_header).to_a.sort_by{|x| x[0]}.to_yaml : scrape_run.response_header

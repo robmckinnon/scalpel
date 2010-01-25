@@ -3,6 +3,15 @@ require 'fileutils'
 require 'rest_client'
 
 class ScrapeRunJob
+
+  class << self
+    def data_git_dir= dir
+      @data_git_dir = dir
+    end
+    def data_git_dir
+      @data_git_dir
+    end
+  end
   
   def initialize uri, scrape_job_id, scrape_run_id, etag, last_modified
     @uri, @scrape_job_id, @scrape_run_id, @etag, @last_modified = uri, scrape_job_id, scrape_run_id, etag, last_modified
@@ -24,7 +33,7 @@ class ScrapeRunJob
   private
   
     def file_name name
-      File.join(RAILS_ROOT, 'data', name)
+      File.join(ScrapeRunJob.data_git_dir, name)
     end
 
     def uri_file_name uri
@@ -41,7 +50,8 @@ class ScrapeRunJob
     end
 
     def pdftotext file
-      `pdftotext -layout #{file}`
+      text_file = "#{file}.txt"
+      `pdftotext -layout #{file} #{text_file}`
     end
 
     def update_scrape_run data

@@ -35,11 +35,6 @@
           Content
           %br
           length
-        - if false
-          %th
-            Response 
-            %br
-            header
         %th Uri
         %th 
           File
@@ -49,6 +44,10 @@
           Git
           %br
           path
+        %th
+          Response 
+          %br
+          header
     %tbody      
       = render :partial => "/scrape_runs/scrape_run" , :collection => @scrape_job.scrape_runs.reverse
 

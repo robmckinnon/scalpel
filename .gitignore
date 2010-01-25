@@ -8,4 +8,6 @@ doc
 log
 rerun.txt
 data
+govtracedata
+config/scalpel.yml
 \#*\#

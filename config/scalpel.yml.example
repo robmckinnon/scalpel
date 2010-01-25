@@ -1,0 +1,10 @@
+# Be sure to restart your server when you modify this file.
+
+development:
+  data_git_dir: 'data'
+
+test:
+  data_git_dir: 'tmp/data'
+
+production:
+  data_git_dir: 'data'
