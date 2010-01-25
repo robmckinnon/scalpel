@@ -63,15 +63,9 @@ class ScrapeRunJob
         puts e.to_s
       end
     end
-    
-    def http_callback response, uri      
-      file = uri_file_name(uri)
-      write_file file, response.to_s
 
-      header = response.headers
-      pdftotext file if header[:content_type] == 'application/pdf'
-
-      data = {
+    def scrape_run_attributes uri, response, header, file
+      {
         'scrape_run[response_code]' => response.code,
         'scrape_run[last_modified]' => header[:last_modified],
         'scrape_run[etag]' => header[:etag],
@@ -81,8 +75,17 @@ class ScrapeRunJob
         'scrape_run[uri]' => uri,
         'scrape_run[file_path]' => file
       }
-      write_file file_name('data.yml'), data.to_yaml
-      update_scrape_run data
+    end
+
+    def http_callback response, uri
+      headers = response.headers
+      file = uri_file_name(uri)
+
+      write_file "#{file}.response.yml", {:uri => uri}.merge(headers).to_yaml.sort
+      write_file file, response.to_s
+      pdftotext file if headers[:content_type] == 'application/pdf'
+
+      update_scrape_run scrape_run_attributes(uri, response, headers, file)
     end
 
     def http_errback e, uri
