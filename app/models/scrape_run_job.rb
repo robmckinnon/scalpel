@@ -1,8 +1,11 @@
 require 'uri'
 require 'fileutils'
 require 'rest_client'
+require 'grit'
 
 class ScrapeRunJob
+
+  include Grit
 
   class << self
     def data_git_dir= dir
@@ -51,7 +54,8 @@ class ScrapeRunJob
 
     def pdftotext file
       text_file = "#{file}.txt"
-      `pdftotext -layout #{file} #{text_file}`
+      `pdftotext -enc UTF-8 -layout #{file} #{text_file}`
+      text_file
     end
 
     def update_scrape_run data
@@ -64,7 +68,7 @@ class ScrapeRunJob
       end
     end
 
-    def scrape_run_attributes uri, response, header, file
+    def scrape_run_attributes uri, response, header, file, git_path, commit_sha
       {
         'scrape_run[response_code]' => response.code,
         'scrape_run[last_modified]' => header[:last_modified],
@@ -73,19 +77,69 @@ class ScrapeRunJob
         'scrape_run[content_length]' => header[:content_length],
         'scrape_run[response_header]' => response.raw_headers.inspect,
         'scrape_run[uri]' => uri,
-        'scrape_run[file_path]' => file
+        'scrape_run[file_path]' => file,
+        'scrape_run[git_path]' => relative_git_path(git_path),
+        'scrape_run[git_commit_sha]' => commit_sha
       }
     end
 
     def http_callback response, uri
       headers = response.headers
-      file = uri_file_name(uri)
+      body_file = uri_file_name(uri)
+      headers_file = "#{body_file}.response.yml"
 
-      write_file "#{file}.response.yml", {:uri => uri}.merge(headers).to_yaml.sort
-      write_file file, response.to_s
-      pdftotext file if headers[:content_type] == 'application/pdf'
+      headers_text = {:uri => uri}.merge(headers).to_yaml.sort
+      response_body = response.to_s
 
-      update_scrape_run scrape_run_attributes(uri, response, headers, file)
+      write_file headers_file, headers_text
+      write_file body_file, response_body
+
+      if headers[:content_type] == 'application/pdf'
+        git_body_file = pdftotext(body_file)
+        response_body = IO.read(git_body_file)
+      else
+        git_body_file = body_file
+      end
+
+      commit_sha = commit_to_git headers[:date], headers_file, headers_text, git_body_file, response_body
+      update_scrape_run scrape_run_attributes(uri, response, headers, body_file, git_body_file, commit_sha)
+    end
+
+    def relative_git_path file
+      file.sub(ScrapeRunJob.data_git_dir,'').sub(/^\//,'')
+    end
+    
+    def commit_to_git date, headers_file, headers_text, git_body_file, response_body
+      relative_body_path = relative_git_path(git_body_file)
+      relative_headers_path = relative_git_path(headers_file)
+      
+      Dir.chdir ScrapeRunJob.data_git_dir
+      repo = Repo.new('.')
+      repo.add(relative_body_path)
+      repo.add(relative_headers_path)
+      message = "committing: #{relative_body_path} [#{date}]"
+      result = repo.commit_index(message)
+
+      puts result
+
+      commit = if result[/nothing added to commit/] || result[/nothing to commit/]
+            nil
+          else
+            repo.commits.select {|c| c.message == message}.first
+          end
+      
+      commit ? commit.id : nil
+      # index = repo.index
+      # index.read_tree('master')
+# 
+      # repo.add(relative_body_path)
+      # repo.add(relative_headers_path)
+      # index.add(relative_body_path, response_body)
+      # index.add(relative_headers_path, headers_text)
+# 
+      # message = "committing: #{relative_body_path}"
+      # commit_sha = index.commit(message, parents=[repo.commits.first], actor=nil, repo.tree('master'), 'master')
+      # commit_sha
     end
 
     def http_errback e, uri

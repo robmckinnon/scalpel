@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(:version => 20100123115650) do
     t.text     "uri"
     t.text     "file_path"
     t.text     "git_path"
+    t.string   "git_commit_sha"
     t.integer  "scrape_job_id"
     t.datetime "created_at"
     t.datetime "updated_at"

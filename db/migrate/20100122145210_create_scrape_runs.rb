@@ -10,6 +10,7 @@ class CreateScrapeRuns < ActiveRecord::Migration
       t.text :uri
       t.text :file_path
       t.text :git_path
+      t.string :git_commit_sha
       t.integer :scrape_job_id
 
       t.timestamps
