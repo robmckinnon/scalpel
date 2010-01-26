@@ -24,16 +24,6 @@ ActiveRecord::Schema.define(:version => 20100123115650) do
     t.datetime "updated_at"
   end
 
-  create_table "scrape_jobs", :force => true do |t|
-    t.string   "name"
-    t.text     "uri"
-    t.string   "last_modified"
-    t.string   "etag"
-    t.boolean  "pdftotext_layout"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "scrape_runs", :force => true do |t|
     t.integer  "response_code"
     t.string   "last_modified"
@@ -45,12 +35,22 @@ ActiveRecord::Schema.define(:version => 20100123115650) do
     t.text     "file_path"
     t.text     "git_path"
     t.string   "git_commit_sha"
-    t.integer  "scrape_job_id"
+    t.integer  "scraper_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "scrape_runs", ["scrape_job_id"], :name => "index_scrape_runs_on_scrape_job_id"
+  add_index "scrape_runs", ["scraper_id"], :name => "index_scrape_runs_on_scraper_id"
+
+  create_table "scrapers", :force => true do |t|
+    t.string   "name"
+    t.text     "uri"
+    t.string   "last_modified"
+    t.string   "etag"
+    t.boolean  "pdftotext_layout"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "slugs", :force => true do |t|
     t.string   "name"

@@ -1,0 +1,20 @@
+%h1 Listing scrapers
+
+%table
+  %tr
+    %th Name
+    %th Uri
+    %th Pdftotext layout
+  - @scrapers.each do |scraper|
+    %tr
+      %td= h scraper.name
+      %td= h scraper.uri
+      %td= h scraper.pdftotext_layout
+        
+      %td= link_to 'Show', object_url(scraper)
+      %td= link_to 'Edit', edit_object_url(scraper)
+      %td= link_to 'Destroy', object_url(scraper), :confirm => 'Are you sure?', :method => :delete
+
+%br/
+
+=link_to 'New scraper', new_object_url

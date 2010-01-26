@@ -1,16 +1,16 @@
 %p
   %strong Name:
-  =h @scrape_job.name
+  =h @scraper.name
 %p
   %strong Uri:
-  =h @scrape_job.uri
+  =h @scraper.uri
 %p
   %strong Pdftotext layout:
-  =h @scrape_job.pdftotext_layout
+  =h @scraper.pdftotext_layout
 
-= link_to "Scrape now", new_scrape_job_scrape_run_url(@scrape_job)
+= link_to "Scrape now", new_scraper_scrape_run_url(@scraper)
 
-- unless @scrape_job.scrape_runs.empty?
+- unless @scraper.scrape_runs.empty?
   %table
     %thead
       %tr
@@ -53,7 +53,7 @@
           %br
           header
     %tbody      
-      = render :partial => "/scrape_runs/scrape_run" , :collection => @scrape_job.scrape_runs.reverse
+      = render :partial => "/scrape_runs/scrape_run" , :collection => @scraper.scrape_runs.reverse
 
 = link_to 'Edit', edit_object_url
 |

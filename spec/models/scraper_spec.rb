@@ -1,11 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe ScrapeJob do
+describe Scraper do
   before(:each) do
-    @scrape_job = ScrapeJob.new
+    @scraper = Scraper.new
   end
 
   it "should be valid" do
-    @scrape_job.should be_valid
+    @scraper.should be_valid
   end
 end

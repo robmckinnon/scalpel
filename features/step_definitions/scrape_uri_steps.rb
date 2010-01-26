@@ -1,9 +1,9 @@
-Given /^I am at the Scrape Jobs page$/ do
-  visit "/scrape_jobs"
+Given /^I am at the Scrapers page$/ do
+  visit "/scrapers"
 end
 
-Given /^I am at the New Scrape Jobs page$/ do
-  visit "/scrape_jobs/new"
+Given /^I am at the New Scraper page$/ do
+  visit "/scrapers/new"
 end
 
 When /^I search for "(.*)"$/ do |postcode_code|

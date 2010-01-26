@@ -1,8 +1,8 @@
-%h1 Editing scrape_job
+%h1 Editing scraper
 
-= error_messages_for :scrape_job
+= error_messages_for :scraper
 
-- form_for(:scrape_job, :url => object_url, :html => { :method => :put }) do |f|
+- form_for(:scraper, :url => object_url, :html => { :method => :put }) do |f|
   = render :partial => "form", :locals => { :f => f }
   %p= submit_tag "Update"
   

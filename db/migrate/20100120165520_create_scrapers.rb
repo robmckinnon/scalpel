@@ -1,6 +1,6 @@
-class CreateScrapeJobs < ActiveRecord::Migration
+class CreateScrapers < ActiveRecord::Migration
   def self.up
-    create_table :scrape_jobs, :force => true do |t|
+    create_table :scrapers, :force => true do |t|
       t.string :name
       t.text :uri
       t.string :last_modified
@@ -12,6 +12,6 @@ class CreateScrapeJobs < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :scrape_jobs
+    drop_table :scrapers
   end
 end
