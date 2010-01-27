@@ -1,0 +1,10 @@
+one:
+  id: 1
+  name: MyString
+  uri_pattern: MyText
+  parser_file: MyString
+two:
+  id: 2
+  name: MyString
+  uri_pattern: MyText
+  parser_file: MyString

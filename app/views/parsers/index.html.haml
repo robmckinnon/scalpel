@@ -1,0 +1,20 @@
+%h1 Listing parsers
+
+%table
+  %tr
+    %th Name
+    %th Uri pattern
+    %th Parser file
+  - @parsers.each do |parser|
+    %tr
+      %td= h parser.name
+      %td= h parser.uri_pattern
+      %td= h parser.parser_file
+        
+      %td= link_to 'Show', object_url(parser)
+      %td= link_to 'Edit', edit_object_url(parser)
+      %td= link_to 'Destroy', object_url(parser), :confirm => 'Are you sure?', :method => :delete
+
+%br/
+
+=link_to 'New parser', new_object_url

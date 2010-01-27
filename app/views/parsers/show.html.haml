@@ -1,0 +1,28 @@
+%p
+  %strong Name:
+  =h @parser.name
+%p
+  %strong Uri pattern:
+  =h @parser.uri_pattern
+%p
+  %strong Parser file:
+  =h @parser.parser_file
+
+= link_to "Parse now", new_parser_parse_run_url(@parser)
+
+- unless @parser.parse_runs.empty?
+  %table
+    %thead
+      %tr
+        %th Scrape run uri
+        %th Scrape commit sha
+        %th Scrape git path
+        %th Commit sha
+        %th Git path
+        %th Parser
+    %tbody
+      = render :partial => "/parse_runs/parse_run" , :collection => @parser.parse_runs.reverse
+
+= link_to 'Edit', edit_object_url
+|
+= link_to 'Back', collection_url

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100123115650) do
+ActiveRecord::Schema.define(:version => 20100127005514) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -20,6 +20,27 @@ ActiveRecord::Schema.define(:version => 20100123115650) do
     t.datetime "locked_at"
     t.datetime "failed_at"
     t.string   "locked_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "parse_runs", :force => true do |t|
+    t.string   "scrape_run_uri"
+    t.string   "scrape_commit_sha"
+    t.text     "scrape_git_path"
+    t.string   "commit_sha"
+    t.text     "git_path"
+    t.integer  "parser_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "parse_runs", ["parser_id"], :name => "index_parse_runs_on_parser_id"
+
+  create_table "parsers", :force => true do |t|
+    t.string   "name"
+    t.text     "uri_pattern"
+    t.string   "parser_file"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

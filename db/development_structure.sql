@@ -13,6 +13,30 @@ CREATE TABLE `delayed_jobs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE `parse_runs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `scrape_run_uri` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `scrape_commit_sha` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `scrape_git_path` text COLLATE utf8_unicode_ci,
+  `commit_sha` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `git_path` text COLLATE utf8_unicode_ci,
+  `parser_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_parse_runs_on_parser_id` (`parser_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `parsers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `uri_pattern` text COLLATE utf8_unicode_ci,
+  `parser_file` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `schema_migrations` (
   `version` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   UNIQUE KEY `unique_schema_migrations` (`version`)
@@ -69,3 +93,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100120165520');
 INSERT INTO schema_migrations (version) VALUES ('20100122145210');
 
 INSERT INTO schema_migrations (version) VALUES ('20100123115650');
+
+INSERT INTO schema_migrations (version) VALUES ('20100126235108');
+
+INSERT INTO schema_migrations (version) VALUES ('20100127005514');

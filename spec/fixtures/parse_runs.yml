@@ -1,0 +1,16 @@
+one:
+  id: 1
+  scrape_run_uri: MyString
+  scrape_commit_sha: MyString
+  scrape_git_path: MyText
+  commit_sha: MyString
+  git_path: MyText
+  parser_id: 1
+two:
+  id: 2
+  scrape_run_uri: MyString
+  scrape_commit_sha: MyString
+  scrape_git_path: MyText
+  commit_sha: MyString
+  git_path: MyText
+  parser_id: 1

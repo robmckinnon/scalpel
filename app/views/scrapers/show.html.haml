@@ -14,45 +14,19 @@
   %table
     %thead
       %tr
-        %th
-          Id
-        %th
-          Git
-          Commit
-          SHA
-        %th
-          Response
-          %br
-          code
-        %th
-          Updated at
-        %th
-          Last
-          %br
-          modified
+        %th Id
+        %th Git Commit SHA
+        %th Response code
+        %th Updated at
+        %th Last modified
         %th Etag
-        %th
-          Content
-          %br
-          type
-        %th
-          Content
-          %br
-          length
+        %th Content type
+        %th Content length
         %th Uri
-        %th 
-          File
-          %br
-          path
-        %th
-          Git
-          %br
-          path
-        %th
-          Response 
-          %br
-          header
-    %tbody      
+        %th File path
+        %th Git path
+        %th Response header
+    %tbody
       = render :partial => "/scrape_runs/scrape_run" , :collection => @scraper.scrape_runs.reverse
 
 = link_to 'Edit', edit_object_url
