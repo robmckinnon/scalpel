@@ -1,0 +1,15 @@
+%p
+  %label{:for => "web_resource_name"} Name:
+  = f.text_field :name
+%p
+  %label{:for => "web_resource_uri"} Uri:
+  = f.text_area :uri
+%p
+  %label{:for => "web_resource_last_modified"} Last modified:
+  = f.text_field :last_modified
+%p
+  %label{:for => "web_resource_etag"} Etag:
+  = f.text_field :etag
+%p
+  %label{:for => "web_resource_pdftotext_layout"} Pdftotext layout:
+  = f.check_box :pdftotext_layout

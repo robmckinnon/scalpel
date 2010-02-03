@@ -1,0 +1,14 @@
+one:
+  id: 1
+  name: MyString
+  uri: MyText
+  last_modified: MyString
+  etag: MyString
+  pdftotext_layout: false
+two:
+  id: 2
+  name: MyString
+  uri: MyText
+  last_modified: MyString
+  etag: MyString
+  pdftotext_layout: false

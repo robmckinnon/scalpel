@@ -1,11 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe ScrapeRun do
+describe WebResource do
   before(:each) do
-    @scrape_run = ScrapeRun.new :web_resource_id => '1'
+    @web_resource = WebResource.new
   end
 
   it "should be valid" do
-    @scrape_run.should be_valid
+    @web_resource.should be_valid
   end
 end

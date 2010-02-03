@@ -11,3 +11,6 @@ data
 govtracedata
 config/scalpel.yml
 \#*\#
+public/www*
+parsers
+temp.rb

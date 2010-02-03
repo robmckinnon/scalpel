@@ -54,11 +54,11 @@ CREATE TABLE `scrape_runs` (
   `file_path` text COLLATE utf8_unicode_ci,
   `git_path` text COLLATE utf8_unicode_ci,
   `git_commit_sha` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `scraper_id` int(11) DEFAULT NULL,
+  `web_resource_id` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_scrape_runs_on_scraper_id` (`scraper_id`)
+  KEY `index_scrape_runs_on_web_resource_id` (`web_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `scrapers` (
@@ -84,6 +84,18 @@ CREATE TABLE `slugs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_slugs_on_n_s_s_and_s` (`name`,`sluggable_type`,`scope`,`sequence`),
   KEY `index_slugs_on_sluggable_id` (`sluggable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `web_resources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `uri` text COLLATE utf8_unicode_ci,
+  `last_modified` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `etag` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pdftotext_layout` tinyint(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO schema_migrations (version) VALUES ('20100119231439');

@@ -1,8 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
 
+  map.resources :web_resources, :has_many => :scrape_runs
+
   map.resources :parsers, :has_many => :parse_runs
 
-  map.resources :scrapers, :has_many => :scrape_runs
+  map.resources :scrapers
 
   # The priority is based upon order of creation: first created -> highest priority.
 

@@ -8,7 +8,6 @@ describe "/scrapers/show.html.haml" do
     @scraper.stub!(:name).and_return("MyString")
     @scraper.stub!(:uri).and_return("MyText")
     @scraper.stub!(:pdftotext_layout).and_return(false)
-    @scraper.stub!(:scrape_runs).and_return []
 
     assigns[:scraper] = @scraper
 

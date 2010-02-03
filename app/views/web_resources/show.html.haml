@@ -1,0 +1,34 @@
+%p
+  %strong Name:
+  =h @web_resource.name
+%p
+  %strong Uri:
+  =h @web_resource.uri
+%p
+  %strong Pdftotext layout:
+  =h @web_resource.pdftotext_layout
+
+= link_to "Scrape now", new_web_resource_scrape_run_url(@web_resource)
+
+- unless @web_resource.scrape_runs.empty?
+  %table
+    %thead
+      %tr
+        %th Id
+        %th Git Commit SHA
+        %th Response code
+        %th Updated at
+        %th Last modified
+        %th Etag
+        %th Content type
+        %th Content length
+        %th Uri
+        %th File path
+        %th Git path
+        %th Response header
+    %tbody
+      = render :partial => "/scrape_runs/scrape_run" , :collection => @web_resource.scrape_runs.reverse
+
+= link_to 'Edit', edit_object_url
+|
+= link_to 'Back', collection_url

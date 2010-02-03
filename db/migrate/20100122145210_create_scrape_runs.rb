@@ -11,12 +11,12 @@ class CreateScrapeRuns < ActiveRecord::Migration
       t.text :file_path
       t.text :git_path
       t.string :git_commit_sha
-      t.integer :scraper_id
+      t.integer :web_resource_id
 
       t.timestamps
     end
     
-    add_index :scrape_runs, :scraper_id
+    add_index :scrape_runs, :web_resource_id
   end
 
   def self.down

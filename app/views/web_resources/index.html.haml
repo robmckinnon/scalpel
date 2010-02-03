@@ -1,0 +1,24 @@
+%h1 Listing web_resources
+
+%table
+  %tr
+    %th Name
+    %th Uri
+    %th Last modified
+    %th Etag
+    %th Pdftotext layout
+  - @web_resources.each do |web_resource|
+    %tr
+      %td= h web_resource.name
+      %td= h web_resource.uri
+      %td= h web_resource.last_modified
+      %td= h web_resource.etag
+      %td= h web_resource.pdftotext_layout
+        
+      %td= link_to 'Show', object_url(web_resource)
+      %td= link_to 'Edit', edit_object_url(web_resource)
+      %td= link_to 'Destroy', object_url(web_resource), :confirm => 'Are you sure?', :method => :delete
+
+%br/
+
+=link_to 'New web resource', new_object_url

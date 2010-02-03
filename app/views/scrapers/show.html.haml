@@ -8,26 +8,6 @@
   %strong Pdftotext layout:
   =h @scraper.pdftotext_layout
 
-= link_to "Scrape now", new_scraper_scrape_run_url(@scraper)
-
-- unless @scraper.scrape_runs.empty?
-  %table
-    %thead
-      %tr
-        %th Id
-        %th Git Commit SHA
-        %th Response code
-        %th Updated at
-        %th Last modified
-        %th Etag
-        %th Content type
-        %th Content length
-        %th Uri
-        %th File path
-        %th Git path
-        %th Response header
-    %tbody
-      = render :partial => "/scrape_runs/scrape_run" , :collection => @scraper.scrape_runs.reverse
 
 = link_to 'Edit', edit_object_url
 |

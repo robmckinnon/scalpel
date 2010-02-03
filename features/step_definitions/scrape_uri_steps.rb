@@ -1,9 +1,9 @@
-Given /^I am at the Scrapers page$/ do
-  visit "/scrapers"
+Given /^I am at the Web Resources page$/ do
+  visit "/web_resources"
 end
 
-Given /^I am at the New Scraper page$/ do
-  visit "/scrapers/new"
+Given /^I am at the New Web Resource page$/ do
+  visit "/web_resources/new"
 end
 
 Given /^I am at the Parsers page$/ do
