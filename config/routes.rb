@@ -1,6 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
 
-  map.resources :web_resources, :has_many => :scrape_runs
+  map.resources :web_resources do |web_resource|
+    web_resource.resources :scrape_runs, :only => [:new, :update]
+  end
 
   map.resources :parsers, :has_many => :parse_runs
 

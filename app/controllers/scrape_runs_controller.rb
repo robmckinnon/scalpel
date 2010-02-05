@@ -1,16 +1,15 @@
 class ScrapeRunsController < ActionController::Base
 
-  before_filter :find_scrape_job
+  before_filter :find_web_resource
   protect_from_forgery :except => :update    
 
   def new
-    @scrape_run = @job.scrape_runs.create
-    @scrape_run.start_run
-    redirect_to :controller => :scrape_jobs, :action => :show, :id => @scrape_job_id
+    @resource.start_scrape
+    redirect_to :controller => :web_resources, :action => :show, :id => @web_resource_id
   end
   
   def update
-    scrape_run = @job.scrape_runs.find(params[:id])
+    scrape_run = @resource.scrape_runs.find(params[:id])
     if scrape_run.update_attributes params[:scrape_run]
       render :status => '200', :text => ''
     else
@@ -19,9 +18,9 @@ class ScrapeRunsController < ActionController::Base
   end
   
   private
-    def find_scrape_job
-      @scrape_job_id = params[:scrape_job_id]
-      return(redirect_to(scrape_jobs_url)) unless @scrape_job_id
-      @job = ScrapeJob.find(@scrape_job_id)
+    def find_web_resource
+      @web_resource_id = params[:web_resource_id]
+      return(redirect_to(web_resources_url)) unless @web_resource_id
+      @resource = WebResource.find(@web_resource_id)
     end
 end
