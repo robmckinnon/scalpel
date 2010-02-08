@@ -10,7 +10,7 @@ class CreateWebResources < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :web_resource, :uri
+    # add_index :web_resources, :uri
   end
 
   def self.down

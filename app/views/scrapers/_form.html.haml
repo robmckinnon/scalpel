@@ -2,8 +2,6 @@
   %label{:for => "scraper_name"} Name:
   = f.text_field :name
 %p
-  %label{:for => "scraper_uri"} Uri:
-  = f.text_area :uri
+  = @scraper.namespace
 %p
-  %label{:for => "scraper_pdftotext_layout"} Pdftotext layout:
-  = f.check_box :pdftotext_layout
+  = @scraper.scraper_file

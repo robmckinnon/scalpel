@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100127005514) do
+ActiveRecord::Schema.define(:version => 20100203143831) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -38,12 +38,15 @@ ActiveRecord::Schema.define(:version => 20100127005514) do
   add_index "parse_runs", ["parser_id"], :name => "index_parse_runs_on_parser_id"
 
   create_table "parsers", :force => true do |t|
+    t.string   "namespace"
     t.string   "name"
     t.text     "uri_pattern"
     t.string   "parser_file"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "parsers", ["parser_file"], :name => "index_parsers_on_parser_file"
 
   create_table "scrape_runs", :force => true do |t|
     t.integer  "response_code"
@@ -56,22 +59,22 @@ ActiveRecord::Schema.define(:version => 20100127005514) do
     t.text     "file_path"
     t.text     "git_path"
     t.string   "git_commit_sha"
-    t.integer  "scraper_id"
+    t.integer  "web_resource_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "scrape_runs", ["scraper_id"], :name => "index_scrape_runs_on_scraper_id"
+  add_index "scrape_runs", ["web_resource_id"], :name => "index_scrape_runs_on_web_resource_id"
 
   create_table "scrapers", :force => true do |t|
+    t.string   "namespace"
     t.string   "name"
-    t.text     "uri"
-    t.string   "last_modified"
-    t.string   "etag"
-    t.boolean  "pdftotext_layout"
+    t.string   "scraper_file"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "scrapers", ["scraper_file"], :name => "index_scrapers_on_scraper_file"
 
   create_table "slugs", :force => true do |t|
     t.string   "name"
@@ -84,5 +87,15 @@ ActiveRecord::Schema.define(:version => 20100127005514) do
 
   add_index "slugs", ["name", "sluggable_type", "scope", "sequence"], :name => "index_slugs_on_n_s_s_and_s", :unique => true
   add_index "slugs", ["sluggable_id"], :name => "index_slugs_on_sluggable_id"
+
+  create_table "web_resources", :force => true do |t|
+    t.string   "name"
+    t.text     "uri"
+    t.string   "last_modified"
+    t.string   "etag"
+    t.boolean  "pdftotext_layout"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

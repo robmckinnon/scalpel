@@ -1,20 +1,15 @@
 %h1 Listing scrapers
 
-%table
-  %tr
-    %th Name
-    %th Uri
-    %th Pdftotext layout
-  - @scrapers.each do |scraper|
-    %tr
-      %td= h scraper.name
-      %td= h scraper.uri
-      %td= h scraper.pdftotext_layout
-        
-      %td= link_to 'Show', object_url(scraper)
-      %td= link_to 'Edit', edit_object_url(scraper)
-      %td= link_to 'Destroy', object_url(scraper), :confirm => 'Are you sure?', :method => :delete
-
-%br/
+- @scrapers_by_namespace.each do |group|
+  %ul
+    %li{ :style => 'list-style-type: none'}
+      = group[0]
+      %ul
+        - group[1].each do |scraper|
+          %li{ :style => 'list-style-type: none'}
+            = link_to scraper.name, scraper
+            [
+            = link_to 'edit', edit_scraper_url(scraper)
+            ]
 
 =link_to 'New scraper', new_object_url

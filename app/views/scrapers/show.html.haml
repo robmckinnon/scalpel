@@ -1,14 +1,3 @@
-%p
-  %strong Name:
-  =h @scraper.name
-%p
-  %strong Uri:
-  =h @scraper.uri
-%p
-  %strong Pdftotext layout:
-  =h @scraper.pdftotext_layout
-
-
-= link_to 'Edit', edit_object_url
-|
-= link_to 'Back', collection_url
+= stylesheet_link_tag 'syntax'
+  
+= highlight_syntax @scraper.code

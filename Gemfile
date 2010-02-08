@@ -16,6 +16,7 @@ gem 'mysql'
 gem 'delayed_job'
 gem 'rest-client'
 gem 'grit'
+gem 'syntax'
 
 only :test do
   gem 'rspec'
