@@ -30,7 +30,7 @@ class ScrapeRunJob
     options.merge!({'If-Modified-Since' => @last_modified}) if @last_modified
 
     begin
-      response = RestClient.get @uri, options 
+      response = RestClient.get @uri, options
       http_callback response, @uri
     rescue Exception => e
       http_errback e, @uri
