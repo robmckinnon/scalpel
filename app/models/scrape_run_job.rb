@@ -44,6 +44,9 @@ class ScrapeRunJob
     end
 
     def uri_file_name uri
+      if uri[/\/$/]
+        uri = "#{uri}index.html" 
+      end
       file = file_name(uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/))
       path = File.dirname file
       FileUtils.mkdir_p(path) unless File.exist?(path)
@@ -124,7 +127,9 @@ class ScrapeRunJob
       message = "committing: #{relative_body_path} [#{date}]"
       result = repo.commit_index(message)
 
+      puts '---'
       puts result
+      puts '==='
 
       commit = if result[/nothing added to commit/] || result[/nothing to commit/]
             nil

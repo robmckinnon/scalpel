@@ -25,12 +25,15 @@ class WebResource < ActiveRecord::Base
   def do_scrape
     scrape_run = scrape_runs.create
     scrape_run.do_run
+    reload # reloads attributes from database
     nil
   end
   
   def contents
     Dir.chdir ScrapeRunJob.data_git_dir
-    repo = Repo.new('.')
-    
+    repo = Grit::Repo.new('.')
+    commit = repo.commit git_commit_sha
+    blob = commit ? (commit.tree / git_path) : nil
+    blob ? blob.data : nil
   end
 end
