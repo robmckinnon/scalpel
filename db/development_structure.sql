@@ -72,7 +72,7 @@ CREATE TABLE `scrapers` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_scrapers_on_scraper_file` (`scraper_file`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `slugs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

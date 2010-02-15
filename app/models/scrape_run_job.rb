@@ -16,8 +16,12 @@ class ScrapeRunJob
     end
   end
   
-  def initialize uri, scraper_id, scrape_run_id, etag, last_modified
-    @uri, @scraper_id, @scrape_run_id, @etag, @last_modified = uri, scraper_id, scrape_run_id, etag, last_modified
+  def initialize scrape_run_id, web_resource
+    @uri = web_resource.uri
+    @web_resource_id = web_resource.id
+    @scrape_run_id = scrape_run_id
+    @etag = web_resource.etag
+    @last_modified = web_resource.last_modified
   end
 
   def perform
@@ -60,7 +64,7 @@ class ScrapeRunJob
 
     def update_scrape_run data
       begin
-        resource_uri = "http://localhost:3000/scrapers/#{@scraper_id}/scrape_runs/#{@scrape_run_id}"      
+        resource_uri = "http://localhost:3000/web_resources/#{@web_resource_id}/scrape_runs/#{@scrape_run_id}"      
         resource = RestClient::Resource.new resource_uri
         resource.put data
       rescue Exception => e

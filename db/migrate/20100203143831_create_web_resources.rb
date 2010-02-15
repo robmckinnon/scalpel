@@ -5,6 +5,7 @@ class CreateWebResources < ActiveRecord::Migration
       t.text :uri
       t.string :last_modified
       t.string :etag
+      t.string :git_commit_sha
       t.boolean :pdftotext_layout
 
       t.timestamps
