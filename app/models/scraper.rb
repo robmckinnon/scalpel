@@ -9,7 +9,7 @@ class Scraper < ActiveRecord::Base
         namespace = directory.split('/').last
         
         scrapers = Dir.glob("#{directory}/*.rb").collect do |file|
-          scraper = find_by_scraper_file(file)
+        scraper = find_by_scraper_file(file)
           unless scraper
             name = File.basename(file, '.rb').humanize
             scraper = Scraper.new(:scraper_file => file, :namespace => namespace, :name => name)

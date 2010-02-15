@@ -4,8 +4,10 @@ describe ScrapersController do
   describe "handling GET /scrapers" do
 
     before(:each) do
+      @namespace = 'namespace'
       @scraper = mock_model(Scraper)
-      Scraper.stub!(:find).and_return([@scraper])
+      @scrapers_by_namespace = [ [@namespace, [@scraper]] ]
+      Scraper.stub!(:scrapers_by_namespace).and_return(@scrapers_by_namespace)
     end
   
     def do_get
@@ -23,13 +25,13 @@ describe ScrapersController do
     end
   
     it "should find all scrapers" do
-      Scraper.should_receive(:find).with(:all).and_return([@scraper])
+      Scraper.should_receive(:scrapers_by_namespace).and_return(@scrapers_by_namespace)
       do_get
     end
   
     it "should assign the found scrapers for the view" do
       do_get
-      assigns[:scrapers].should == [@scraper]
+      assigns[:scrapers_by_namespace].should == @scrapers_by_namespace
     end
   end
 

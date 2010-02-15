@@ -29,12 +29,14 @@ CREATE TABLE `parse_runs` (
 
 CREATE TABLE `parsers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `namespace` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `uri_pattern` text COLLATE utf8_unicode_ci,
   `parser_file` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `index_parsers_on_parser_file` (`parser_file`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `schema_migrations` (
@@ -63,15 +65,14 @@ CREATE TABLE `scrape_runs` (
 
 CREATE TABLE `scrapers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `namespace` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `uri` text COLLATE utf8_unicode_ci,
-  `last_modified` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `etag` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `pdftotext_layout` tinyint(1) DEFAULT NULL,
+  `scraper_file` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  PRIMARY KEY (`id`),
+  KEY `index_scrapers_on_scraper_file` (`scraper_file`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `slugs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -109,3 +110,5 @@ INSERT INTO schema_migrations (version) VALUES ('20100123115650');
 INSERT INTO schema_migrations (version) VALUES ('20100126235108');
 
 INSERT INTO schema_migrations (version) VALUES ('20100127005514');
+
+INSERT INTO schema_migrations (version) VALUES ('20100203143831');
