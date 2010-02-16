@@ -21,8 +21,8 @@ class ScrapeRunJob
       @git_dir
     end
     
-    def git_repo
-      unless @repo
+    def git_repo force=false
+      if !@repo || force
         Dir.chdir git_dir
         @repo = Grit::Repo.new('.')
       end
@@ -60,8 +60,8 @@ class ScrapeRunJob
 
   private
   
-    def repo
-      ScrapeRunJob.git_repo
+    def repo force=false
+      ScrapeRunJob.git_repo force
     end
 
     def file_name name
@@ -152,11 +152,21 @@ class ScrapeRunJob
     end
 
     def last_contents
-      commit = repo.commit @prev_git_commit_sha
-      blob = commit ? (commit.tree / @prev_git_path) : nil
-      blob ? blob.data : nil
+      if @prev_git_commit_sha.blank?
+        nil
+      else
+        begin
+          commit = repo.commit @prev_git_commit_sha
+        rescue Grit::Git::GitTimeout => e
+          puts e.class.name
+          puts e.to_s
+          commit = repo(force=true).commit @prev_git_commit_sha
+        end
+        blob = commit ? (commit.tree / @prev_git_path) : nil
+        blob ? blob.data : nil
+      end
     end
-    
+
     def no_need_to_update?(response_body)
       response_body == last_contents 
     end

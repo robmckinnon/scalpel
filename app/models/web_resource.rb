@@ -3,7 +3,7 @@ require 'hpricot'
 class WebResource < ActiveRecord::Base
 
   validates_uniqueness_of :uri
-  validates_uniqueness_of :git_path
+  validates_uniqueness_of :git_path, :allow_nil => true
 
   has_many :scraped_resources
   has_many :scrape_runs
