@@ -17,6 +17,8 @@ gem 'delayed_job'
 gem 'rest-client'
 gem 'grit'
 gem 'syntax'
+gem 'hpricot'
+gem 'morph'
 
 only :test do
   gem 'rspec'

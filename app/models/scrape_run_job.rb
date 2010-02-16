@@ -16,12 +16,15 @@ class ScrapeRunJob
     end
   end
   
-  def initialize scrape_run_id, web_resource
+  def initialize scrape_run_id, web_resource, &block
     @uri = web_resource.uri
     @web_resource_id = web_resource.id
     @scrape_run_id = scrape_run_id
     @etag = web_resource.etag
     @last_modified = web_resource.last_modified
+    @before_save_block = block ? block : nil
+    @prev_git_commit_sha = web_resource.git_commit_sha
+    @prev_git_path = web_resource.git_path
   end
 
   def perform
@@ -31,7 +34,11 @@ class ScrapeRunJob
 
     begin
       response = RestClient.get @uri, options
-      http_callback response, @uri
+      if @before_save_block
+        http_callback response, @uri, &@before_save_block
+      else
+        http_callback response, @uri
+      end
     rescue Exception => e
       http_errback e, @uri
     end
@@ -90,13 +97,17 @@ class ScrapeRunJob
       }
     end
 
-    def http_callback response, uri
+    def http_callback response, uri, &block
       headers = response.headers
       body_file = uri_file_name(uri)
       headers_file = "#{body_file}.response.yml"
 
       headers_text = {:uri => uri}.merge(headers).to_yaml.sort
       response_body = response.to_s
+      
+      if block
+        response_body = yield response_body
+      end
 
       write_file headers_file, headers_text
       write_file body_file, response_body
@@ -115,40 +126,60 @@ class ScrapeRunJob
     def relative_git_path file
       file.sub(ScrapeRunJob.data_git_dir,'').sub(/^\//,'')
     end
+
+    def repo
+      unless @repo
+        Dir.chdir ScrapeRunJob.data_git_dir
+        @repo = Repo.new('.')
+      end
+      @repo
+    end
+
+    def last_contents
+      commit = repo.commit @prev_git_commit_sha
+      blob = commit ? (commit.tree / @prev_git_path) : nil
+      blob ? blob.data : nil
+    end
+    
+    def no_need_to_update?(response_body)
+      response_body == last_contents 
+    end
     
     def commit_to_git date, headers_file, headers_text, git_body_file, response_body
-      relative_body_path = relative_git_path(git_body_file)
-      relative_headers_path = relative_git_path(headers_file)
-      
-      Dir.chdir ScrapeRunJob.data_git_dir
-      repo = Repo.new('.')
-      repo.add(relative_body_path)
-      repo.add(relative_headers_path)
-      message = "committing: #{relative_body_path} [#{date}]"
-      result = repo.commit_index(message)
-
-      puts '---'
-      puts result
-      puts '==='
-
-      commit = if result[/nothing added to commit/] || result[/nothing to commit/]
-            nil
-          else
-            repo.commits.select {|c| c.message == message}.first
-          end
-      
-      commit ? commit.id : nil
-      # index = repo.index
-      # index.read_tree('master')
-# 
-      # repo.add(relative_body_path)
-      # repo.add(relative_headers_path)
-      # index.add(relative_body_path, response_body)
-      # index.add(relative_headers_path, headers_text)
-# 
-      # message = "committing: #{relative_body_path}"
-      # commit_sha = index.commit(message, parents=[repo.commits.first], actor=nil, repo.tree('master'), 'master')
-      # commit_sha
+      if no_need_to_update?(response_body)
+        nil
+      else
+        relative_body_path = relative_git_path(git_body_file)
+        relative_headers_path = relative_git_path(headers_file)
+        
+        repo.add(relative_body_path)
+        repo.add(relative_headers_path)
+        message = "committing: #{relative_body_path} [#{date}]"
+        result = repo.commit_index(message)
+  
+        puts '---'
+        puts result
+        puts '==='
+  
+        commit = if result[/nothing added to commit/] || result[/nothing to commit/]
+              nil
+            else
+              repo.commits.detect {|c| c.message == message}
+            end
+  
+        commit ? commit.id : nil
+        # index = repo.index
+        # index.read_tree('master')
+  # 
+        # repo.add(relative_body_path)
+        # repo.add(relative_headers_path)
+        # index.add(relative_body_path, response_body)
+        # index.add(relative_headers_path, headers_text)
+  # 
+        # message = "committing: #{relative_body_path}"
+        # commit_sha = index.commit(message, parents=[repo.commits.first], actor=nil, repo.tree('master'), 'master')
+        # commit_sha
+      end
     end
 
     def http_errback e, uri
@@ -156,7 +187,8 @@ class ScrapeRunJob
         data = { 'scrape_run[response_code]' => e.http_code }
         update_scrape_run data
       else
-        puts "#{uri}\n" + e.to_s     
+        puts "#{uri}\n" + e.to_s
+        puts e.backtrace.join("\n")
       end
     end
 end

@@ -6,9 +6,9 @@ class ScrapeRun < ActiveRecord::Base
   after_save :update_etag_and_last_modified_and_git_commit_sha
 
   # do synchronous scrape run
-  def do_run
+  def do_run &block
     if response_code.blank? && RAILS_ENV != 'test'
-      job = ScrapeRunJob.new(self.id, web_resource)
+      job = ScrapeRunJob.new(self.id, web_resource, &block)
       job.perform # updates scrape run via restful api
     end
   end
