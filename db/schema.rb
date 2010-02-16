@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100203143831) do
+ActiveRecord::Schema.define(:version => 20100216122550) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -48,6 +48,16 @@ ActiveRecord::Schema.define(:version => 20100203143831) do
 
   add_index "parsers", ["parser_file"], :name => "index_parsers_on_parser_file"
 
+  create_table "scrape_results", :force => true do |t|
+    t.integer  "scraper_id"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "scrape_results", ["scraper_id"], :name => "index_scrape_results_on_scraper_id"
+
   create_table "scrape_runs", :force => true do |t|
     t.integer  "response_code"
     t.string   "last_modified"
@@ -65,6 +75,18 @@ ActiveRecord::Schema.define(:version => 20100203143831) do
   end
 
   add_index "scrape_runs", ["web_resource_id"], :name => "index_scrape_runs_on_web_resource_id"
+
+  create_table "scraped_resources", :force => true do |t|
+    t.integer  "scrape_result_id"
+    t.integer  "web_resource_id"
+    t.text     "git_path"
+    t.string   "git_commit_sha"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "scraped_resources", ["scrape_result_id"], :name => "index_scraped_resources_on_scrape_result_id"
+  add_index "scraped_resources", ["web_resource_id"], :name => "index_scraped_resources_on_web_resource_id"
 
   create_table "scrapers", :force => true do |t|
     t.string   "namespace"

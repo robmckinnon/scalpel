@@ -44,6 +44,17 @@ CREATE TABLE `schema_migrations` (
   UNIQUE KEY `unique_schema_migrations` (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE `scrape_results` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `scraper_id` int(11) DEFAULT NULL,
+  `start_time` datetime DEFAULT NULL,
+  `end_time` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_scrape_results_on_scraper_id` (`scraper_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `scrape_runs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `response_code` int(11) DEFAULT NULL,
@@ -61,6 +72,19 @@ CREATE TABLE `scrape_runs` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_scrape_runs_on_web_resource_id` (`web_resource_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `scraped_resources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `scrape_result_id` int(11) DEFAULT NULL,
+  `web_resource_id` int(11) DEFAULT NULL,
+  `git_path` text COLLATE utf8_unicode_ci,
+  `git_commit_sha` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_scraped_resources_on_scrape_result_id` (`scrape_result_id`),
+  KEY `index_scraped_resources_on_web_resource_id` (`web_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `scrapers` (
@@ -72,7 +96,7 @@ CREATE TABLE `scrapers` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_scrapers_on_scraper_file` (`scraper_file`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `slugs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -93,11 +117,14 @@ CREATE TABLE `web_resources` (
   `uri` text COLLATE utf8_unicode_ci,
   `last_modified` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `etag` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `file_path` text COLLATE utf8_unicode_ci,
+  `git_path` text COLLATE utf8_unicode_ci,
+  `git_commit_sha` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `pdftotext_layout` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO schema_migrations (version) VALUES ('20100119231439');
 
@@ -112,3 +139,7 @@ INSERT INTO schema_migrations (version) VALUES ('20100126235108');
 INSERT INTO schema_migrations (version) VALUES ('20100127005514');
 
 INSERT INTO schema_migrations (version) VALUES ('20100203143831');
+
+INSERT INTO schema_migrations (version) VALUES ('20100216122336');
+
+INSERT INTO schema_migrations (version) VALUES ('20100216122550');

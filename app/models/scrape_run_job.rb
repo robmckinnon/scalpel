@@ -5,14 +5,28 @@ require 'grit'
 
 class ScrapeRunJob
 
-  include Grit
-
   class << self
     def data_git_dir= dir
+      FileUtils.mkdir_p dir unless File.exist? dir
       @data_git_dir = dir
     end
     def data_git_dir
       @data_git_dir
+    end
+    
+    def git_dir= dir
+      @git_dir = dir
+    end
+    def git_dir
+      @git_dir
+    end
+    
+    def git_repo
+      unless @repo
+        Dir.chdir git_dir
+        @repo = Grit::Repo.new('.')
+      end
+      @repo
     end
   end
   
@@ -46,15 +60,27 @@ class ScrapeRunJob
 
   private
   
+    def repo
+      ScrapeRunJob.git_repo
+    end
+
     def file_name name
       File.join(ScrapeRunJob.data_git_dir, name)
     end
 
-    def uri_file_name uri
-      if uri[/\/$/]
-        uri = "#{uri}index.html" 
+    def uri_file_name uri, content_type
+      uri_path = URI.parse(uri)
+      file_type = content_type.split('/').last
+
+      if uri_path == '/'
+        uri = "#{uri}index.#{file_type}"
       end
       file = file_name(uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/))
+      
+      if File.extname(file) == ''
+        file = "#{file}.#{file_type}"
+      end
+
       path = File.dirname file
       FileUtils.mkdir_p(path) unless File.exist?(path)
       file
@@ -99,15 +125,13 @@ class ScrapeRunJob
 
     def http_callback response, uri, &block
       headers = response.headers
-      body_file = uri_file_name(uri)
+      body_file = uri_file_name(uri, headers[:content_type])
       headers_file = "#{body_file}.response.yml"
 
       headers_text = {:uri => uri}.merge(headers).to_yaml.sort
       response_body = response.to_s
-      
-      if block
-        response_body = yield response_body
-      end
+            
+      yield response_body if block # process text before saving
 
       write_file headers_file, headers_text
       write_file body_file, response_body
@@ -124,15 +148,7 @@ class ScrapeRunJob
     end
 
     def relative_git_path file
-      file.sub(ScrapeRunJob.data_git_dir,'').sub(/^\//,'')
-    end
-
-    def repo
-      unless @repo
-        Dir.chdir ScrapeRunJob.data_git_dir
-        @repo = Repo.new('.')
-      end
-      @repo
+      file.sub(ScrapeRunJob.git_dir,'').sub(/^\//,'')
     end
 
     def last_contents

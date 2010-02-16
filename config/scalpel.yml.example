@@ -1,10 +1,10 @@
 # Be sure to restart your server when you modify this file.
 
 development:
-  data_git_dir: 'data'
+  data_git_dir: 'data/scraped'
 
 test:
-  data_git_dir: 'tmp/data'
+  data_git_dir: 'tmp/data/scraped'
 
 production:
-  data_git_dir: 'data'
+  data_git_dir: 'data/scraped'
