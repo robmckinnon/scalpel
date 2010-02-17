@@ -64,18 +64,19 @@ class ScrapeRunJob
       ScrapeRunJob.git_repo force
     end
 
-    def file_name name
-      File.join(ScrapeRunJob.data_git_dir, name)
+    def file_name uri
+      parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub('&','__')}
+      File.join(ScrapeRunJob.data_git_dir, parts)
     end
 
     def uri_file_name uri, content_type
       uri_path = URI.parse(uri)
-      file_type = content_type.split('/').last
+      file_type = content_type.split('/').last.split(';').first
 
       if uri_path == '/'
         uri = "#{uri}index.#{file_type}"
       end
-      file = file_name(uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/))
+      file = file_name(uri)
       
       if File.extname(file) == ''
         file = "#{file}.#{file_type}"
@@ -151,17 +152,27 @@ class ScrapeRunJob
       file.sub(ScrapeRunJob.git_dir,'').sub(/^\//,'')
     end
 
+    def rescue_if_git_timeout &block
+      begin
+        yield repo
+      rescue Grit::Git::GitTimeout => e
+        puts e.class.name
+        puts e.to_s
+        puts e.backtrace.select{|x| x[/app\/models/]}.join("\n")
+        sleep 5
+        repo(force=true)
+        rescue_if_git_timeout &block
+      end      
+    end
+    
     def last_contents
       if @prev_git_commit_sha.blank?
         nil
       else
-        begin
-          commit = repo.commit @prev_git_commit_sha
-        rescue Grit::Git::GitTimeout => e
-          puts e.class.name
-          puts e.to_s
-          commit = repo(force=true).commit @prev_git_commit_sha
+        commit = rescue_if_git_timeout do |git_repo|
+          git_repo.commit @prev_git_commit_sha
         end
+
         blob = commit ? (commit.tree / @prev_git_path) : nil
         blob ? blob.data : nil
       end
@@ -181,7 +192,10 @@ class ScrapeRunJob
         repo.add(relative_body_path)
         repo.add(relative_headers_path)
         message = "committing: #{relative_body_path} [#{date}]"
-        result = repo.commit_index(message)
+        puts message
+        result = rescue_if_git_timeout do |git_repo|
+          git_repo.commit_index(message)
+        end
   
         puts '---'
         puts result
