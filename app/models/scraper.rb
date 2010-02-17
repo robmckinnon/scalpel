@@ -30,17 +30,20 @@ class Scraper < ActiveRecord::Base
 
   def run_scraper
     result = scrape_results.create
-    result.start_time = Time.now
+    result.commit_separately = !first_run?
 
-    scraper = scraper_instance
-    scraper.perform result
+    scraper_instance.perform result
 
     result.end_time = Time.now
     result.save
   end
   
-  private
+  def first_run?
+    scrape_results.empty?
+  end
   
+  private
+    
     def scraper_instance
       require scraper_file
       scraper_module = namespace.camelize

@@ -3,6 +3,10 @@ class ScrapeResult < ActiveRecord::Base
   belongs_to :scraper
   has_many :scraped_resources
 
+  attr_accessor :commit_separately
+
+  before_create :set_start_time
+
   def add web_resource
     unless has_resource?(web_resource)
       scraped_resources.create(:web_resource_id => web_resource.id,
@@ -18,4 +22,9 @@ class ScrapeResult < ActiveRecord::Base
       false
     end
   end
+  
+  private
+    def set_start_time
+      self.start_time = Time.now
+    end
 end

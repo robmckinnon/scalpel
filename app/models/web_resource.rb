@@ -36,7 +36,7 @@ class WebResource < ActiveRecord::Base
   end
   
   def last_commit
-    repo = ScrapeRunJob.git_repo
+    repo = GitRepo.git_repo
     repo.commit git_commit_sha
   end
 

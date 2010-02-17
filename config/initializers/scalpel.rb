@@ -9,5 +9,5 @@ git_dir = data_git_dir.split('/').first
 git_dir = File.expand_path(File.join(RAILS_ROOT,git_dir))
 data_git_dir = File.expand_path(File.join(RAILS_ROOT,data_git_dir))
 
-ScrapeRunJob.git_dir= git_dir
-ScrapeRunJob.data_git_dir= data_git_dir
+GitRepo.git_dir= git_dir
+GitRepo.data_git_dir= data_git_dir
