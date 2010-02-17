@@ -80,29 +80,32 @@ class GitRepo
       end      
     end
 
-    def commit_to_git date, headers_file, headers_text, git_body_file, response_body
-      relative_body_path = relative_git_path(git_body_file)
-      relative_headers_path = relative_git_path(headers_file)
-      
-      repo.add(relative_body_path)
-      repo.add(relative_headers_path)
-      message = "committing: #{relative_body_path} [#{date}]"
+    # adds to git repository, but does not commit, returns git_path
+    def add_to_git file_name, text
+      write_file(file_name, text)
+      git_path = relative_git_path(file_name)
+      puts "adding: #{git_path}"
+      repo.add(git_path)
+      git_path
+    end
+
+    # commits to git repository, add_to_git must be called first, returns git_commit_sha
+    def commit_to_git message
       puts message
-      result = rescue_if_git_timeout do |git_repo|
-        git_repo.commit_index(message)
+      result = rescue_if_git_timeout do |repository|
+        repository.commit_index(message)
+      end
+      puts "---\n#{result}\n==="
+
+      commit = rescue_if_git_timeout do |repository|
+        if result[/nothing added to commit/] || result[/nothing to commit/]
+          nil
+        else
+          repository.commits.detect {|c| c.message == message}
+        end
       end
 
-      puts '---'
-      puts result
-      puts '==='
-
-      commit = if result[/nothing added to commit/] || result[/nothing to commit/]
-            nil
-          else
-            repo.commits.detect {|c| c.message == message}
-          end
-
-      commit ? commit.id : nil
+      git_commit_sha = commit ? commit.id : nil
     end
   end
       

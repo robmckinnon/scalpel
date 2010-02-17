@@ -9,13 +9,13 @@ class WebResource < ActiveRecord::Base
   has_many :scrape_runs
 
   class << self
-    def scrape uri, &block
+    def scrape uri, commit_result, &block
       web_resource = find_or_create_by_uri(uri)
       if web_resource.scrape_runs.empty?
         web_resource.scrape_runs = []
         web_resource.save!
       end
-      web_resource.do_scrape &block # synchronous call
+      web_resource.do_scrape(commit_result) &block # synchronous call
       web_resource
     end
   end
@@ -28,9 +28,9 @@ class WebResource < ActiveRecord::Base
   end
   
   # do scrape - synchronous
-  def do_scrape &block
+  def do_scrape commit_result, &block
     scrape_run = scrape_runs.create
-    scrape_run.do_run &block
+    scrape_run.do_run commit_result, &block
     reload # reloads attributes from database
     nil
   end
@@ -41,9 +41,14 @@ class WebResource < ActiveRecord::Base
   end
 
   def contents
-    commit = last_commit
-    blob = commit ? (commit.tree / git_path) : nil
-    blob ? blob.data : nil
+    if commit = last_commit
+      blob = commit ? (commit.tree / git_path) : nil
+      blob ? blob.data : nil
+    elsif file_path && File.exist?(file_path)
+      IO.read(file_path)
+    else
+      nil
+    end
   end
   
   def hpricot_doc

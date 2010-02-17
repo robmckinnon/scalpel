@@ -6,9 +6,9 @@ class ScrapeRun < ActiveRecord::Base
   after_save :update_etag_and_last_modified_and_git_commit_sha
 
   # do synchronous scrape run
-  def do_run &block
+  def do_run commit_result, &block
     if response_code.blank? && RAILS_ENV != 'test'
-      job = ScrapeRunJob.new(self.id, web_resource, &block)
+      job = ScrapeRunJob.new(self.id, web_resource, commit_result, &block)
       job.perform # updates scrape run via restful api
     end
   end
@@ -21,7 +21,7 @@ class ScrapeRun < ActiveRecord::Base
   end
   
   def update_etag_and_last_modified_and_git_commit_sha
-    if !etag.blank? || !last_modified.blank? || !git_commit_sha.blank?
+    if !etag.blank? || !last_modified.blank? || !git_commit_sha.blank? || !git_path.blank?
       web_resource.etag = etag
       web_resource.last_modified = last_modified
       web_resource.git_commit_sha = git_commit_sha if git_commit_sha

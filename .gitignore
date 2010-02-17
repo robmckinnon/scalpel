@@ -14,3 +14,5 @@ config/scalpel.yml
 public/www*
 parsers
 temp.rb
+lib/scrapers
+gov*
