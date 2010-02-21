@@ -1,12 +1,6 @@
-# directory "vendor/rails", :glob => "{*/,}*.gemspec"
-# git "git://github.com/rails/arel.git"
-# git "git://github.com/rails/rack.git"
-
-clear_sources
-bundle_path 'vendor/bundler_gems'
-source 'http://gemcutter.org'
+# bundle install vendor/bundler_gems
+source 'http://rubygems.org'
 source 'http://gems.github.com'
-disable_system_gems
 
 gem 'rails', '2.3.5'
 gem 'haml'
@@ -19,8 +13,9 @@ gem 'grit'
 gem 'syntax'
 gem 'hpricot'
 gem 'morph'
+gem 'whenever'
 
-only :test do
+group :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'test-unit', '1.2.3'
@@ -29,5 +24,4 @@ only :test do
   gem 'database_cleaner'
   gem 'webrat'
   gem 'autotest-rails'
-  gem 'spork'
 end
