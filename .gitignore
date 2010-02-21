@@ -1,4 +1,7 @@
 bin
+.bundle
+dish
+blade
 vendor/plugins
 vendor/bundler_gems
 test
