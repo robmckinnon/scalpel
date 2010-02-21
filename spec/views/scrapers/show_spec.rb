@@ -7,6 +7,7 @@ describe "/scrapers/show.html.haml" do
     @scraper = mock_model(Scraper)
     @scraper.stub!(:name).and_return("MyString")
     @scraper.stub!(:uri).and_return("MyText")
+    @scraper.stub!(:code).and_return("code")
     @scraper.stub!(:pdftotext_layout).and_return(false)
 
     assigns[:scraper] = @scraper
@@ -17,9 +18,7 @@ describe "/scrapers/show.html.haml" do
 
   it "should render attributes in <p>" do
     render "/scrapers/show.html.haml"
-    response.should have_text(/MyString/)
-    response.should have_text(/MyText/)
-    response.should have_text(/als/)
+    response.should have_text(/code/)
   end
 end
 
