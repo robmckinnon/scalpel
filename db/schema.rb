@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100216122550) do
+ActiveRecord::Schema.define(:version => 20100221220008) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(:version => 20100216122550) do
     t.string   "scraper_file"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "schedule_every"
   end
 
   add_index "scrapers", ["scraper_file"], :name => "index_scrapers_on_scraper_file"
