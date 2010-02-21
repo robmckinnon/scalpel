@@ -2,6 +2,8 @@
   %label{:for => "scraper_name"} Name:
   = f.text_field :name
 %p
+  %label{:for => "namespace"} Namespace:
   = @scraper.namespace
 %p
+  %label{:for => "scraper_file"} File:
   = @scraper.scraper_file

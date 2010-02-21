@@ -1,4 +1,4 @@
-# bundle install vendor/bundler_gems
+# bundle install vendor/bundler_gems --disable-shared-gems
 source 'http://rubygems.org'
 source 'http://gems.github.com'
 
