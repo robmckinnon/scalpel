@@ -29,7 +29,7 @@ class Scraper < ActiveRecord::Base
   end
 
   def run_scraper
-    commit_at_end = first_run?
+    commit_at_end = true # always commit at end
     result = scrape_results.create
     result.commit_result = !commit_at_end
 
@@ -37,7 +37,7 @@ class Scraper < ActiveRecord::Base
     scraper.perform result
 
     if commit_at_end
-      message = "committing first run of #{scraper.class.name} [#{Time.now}]"
+      message = "committing run of #{scraper.class.name} [#{Time.now}]"
       commit_sha = GitRepo.commit_to_git(message)
     end
 
