@@ -19,3 +19,5 @@ parsers
 temp.rb
 lib/scrapers
 gov*
+Gemfile.lock
+config/schedule.rb

@@ -8,6 +8,7 @@
         - group[1].each do |scraper|
           %li{ :style => 'list-style-type: none'}
             = link_to scraper.name, scraper
+            = scraper.schedule_every.to_s.sub('1.day','daily').sub(':at => ','')
             [
             = link_to 'edit', edit_scraper_url(scraper)
             ]

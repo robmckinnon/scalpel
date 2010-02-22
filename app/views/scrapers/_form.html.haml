@@ -2,6 +2,9 @@
   %label{:for => "scraper_name"} Name:
   = f.text_field :name
 %p
+  %label{:for => "schedule_every"} Run every:
+  = f.text_field :schedule_every
+%p
   %label{:for => "namespace"} Namespace:
   = @scraper.namespace
 %p
