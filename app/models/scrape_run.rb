@@ -8,7 +8,7 @@ class ScrapeRun < ActiveRecord::Base
   # do synchronous scrape run
   def do_run commit_result, &block
     if response_code.blank? && RAILS_ENV != 'test'
-      job = ScrapeRunJob.new(self.id, web_resource, commit_result, &block)
+      job = ScrapeRunJob.new(self.id, web_resource, commit_result, asynchronus=false, &block)
       job.perform # updates scrape run via restful api
     end
   end
@@ -16,7 +16,7 @@ class ScrapeRun < ActiveRecord::Base
   # start asynchronous scrape run
   def start_run
     if response_code.blank? && RAILS_ENV != 'test'
-      Delayed::Job.enqueue ScrapeRunJob.new(self.id, web_resource)
+      Delayed::Job.enqueue ScrapeRunJob.new(self.id, web_resource, false, asynchronus=true)
     end
   end
   

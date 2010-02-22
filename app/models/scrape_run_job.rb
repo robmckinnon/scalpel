@@ -2,7 +2,7 @@ require 'rest_client'
 
 class ScrapeRunJob
   
-  def initialize scrape_run_id, web_resource, commit_result, &block
+  def initialize scrape_run_id, web_resource, commit_result, asynchronus=false, &block
     @uri = web_resource.uri
     @web_resource_id = web_resource.id
     @scrape_run_id = scrape_run_id
@@ -12,6 +12,7 @@ class ScrapeRunJob
     @prev_git_commit_sha = web_resource.git_commit_sha
     @prev_git_path = web_resource.git_path
     @commit_result = commit_result
+    @asynchronus = asynchronus
   end
 
   def perform
@@ -34,28 +35,48 @@ class ScrapeRunJob
   private
   
     def update_scrape_run data
-      begin
-        resource_uri = "http://localhost:3000/web_resources/#{@web_resource_id}/scrape_runs/#{@scrape_run_id}"      
-        resource = RestClient::Resource.new resource_uri
-        resource.put data
-      rescue Exception => e
-        puts e.to_s
+      if @asynchronus
+        begin
+          resource_uri = "http://localhost:3000/web_resources/#{@web_resource_id}/scrape_runs/#{@scrape_run_id}"
+          resource = RestClient::Resource.new resource_uri
+          resource.put data
+        rescue Exception => e
+          puts e.to_s
+        end
+      else
+        scrape_run = ScrapeRun.find(@scrape_run_id)
+        scrape_run.update_attributes(data)
       end
     end
 
     def scrape_run_attributes uri, response, header, file, relative_git_path, commit_sha
-      {
-        'scrape_run[response_code]' => response.code,
-        'scrape_run[last_modified]' => header[:last_modified],
-        'scrape_run[etag]' => header[:etag],
-        'scrape_run[content_type]' => header[:content_type],
-        'scrape_run[content_length]' => header[:content_length],
-        'scrape_run[response_header]' => response.raw_headers.inspect,
-        'scrape_run[uri]' => uri,
-        'scrape_run[file_path]' => file,
-        'scrape_run[git_path]' => relative_git_path,
-        'scrape_run[git_commit_sha]' => commit_sha
-      }
+      if @asynchronus
+        {
+          'scrape_run[response_code]' => response.code,
+          'scrape_run[last_modified]' => header[:last_modified],
+          'scrape_run[etag]' => header[:etag],
+          'scrape_run[content_type]' => header[:content_type],
+          'scrape_run[content_length]' => header[:content_length],
+          'scrape_run[response_header]' => response.raw_headers.inspect,
+          'scrape_run[uri]' => uri,
+          'scrape_run[file_path]' => file,
+          'scrape_run[git_path]' => relative_git_path,
+          'scrape_run[git_commit_sha]' => commit_sha
+        }
+      else
+        {
+          :response_code => response.code,
+          :last_modified => header[:last_modified],
+          :etag => header[:etag],
+          :content_type => header[:content_type],
+          :content_length => header[:content_length],
+          :response_header => response.raw_headers.inspect,
+          :uri => uri,
+          :file_path => file,
+          :git_path => relative_git_path,
+          :git_commit_sha => commit_sha
+        }
+      end
     end
 
     def pdf_to_text body_file, response_body
