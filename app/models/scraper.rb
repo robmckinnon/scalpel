@@ -54,7 +54,7 @@ class Scraper < ActiveRecord::Base
     result = scrape_results.create
     result.commit_result = !commit_at_end
 
-    scraper = scraper_instance
+    scraper = code_instance
     scraper.perform result
 
     if commit_at_end
@@ -70,14 +70,4 @@ class Scraper < ActiveRecord::Base
     scrape_results.empty?
   end
   
-  private
-    
-    def scraper_instance
-      require scraper_file
-      scraper_module = namespace.camelize
-      scraper_class = File.basename(scraper_file.chomp('.rb')).camelize
-      scraper_type = "#{scraper_module}::#{scraper_class}".constantize
-      scraper_type.new
-    end
-
 end

@@ -4,6 +4,18 @@ module Acts
     
     def self.included(base) # :nodoc:
       base.extend ClassMethods
+      base.send(:include, InstanceMethods)
+    end
+
+    module InstanceMethods
+      def code_instance
+        code_file = send("#{self.class.name.downcase}_file".to_sym)
+        require code_file
+        code_module = namespace.camelize
+        code_class = File.basename(code_file.chomp('.rb')).camelize
+        code_type = "#{code_module}::#{code_class}".constantize
+        code_type.new
+      end
     end
 
     module ClassMethods
@@ -19,7 +31,7 @@ module Acts
       def code_dir
         "#{RAILS_ROOT}/lib/#{self.name.downcase.pluralize}"
       end
-    
+
       def code_by_namespace
         Dir.glob("#{code_dir}/*").collect do |directory|
           namespace = directory.split('/').last
