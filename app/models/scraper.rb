@@ -1,41 +1,19 @@
 require 'open-uri'
+require 'namespaced_code_file'
 
 class Scraper < ActiveRecord::Base
   
   has_many :scrape_results
+  has_one :parser
+
+  include Acts::NamespacedCodeFile
 
   class << self
-
-    def run path
-      scraper = find_by_scraper_path path
-      scraper.run_scraper
-    end
     
-    def find_by_scraper_path path
-      find_by_scraper_file("#{scrapers_dir}#{path}")
+    def code_suffix
+      '_scrape'
     end
 
-    def scrapers_dir
-      "#{RAILS_ROOT}/lib/scrapers"
-    end
-
-    def scrapers_by_namespace
-      Dir.glob("#{scrapers_dir}/*").collect do |directory|
-        namespace = directory.split('/').last
-        
-        scrapers = Dir.glob("#{directory}/*_scrape.rb").collect do |file|
-        scraper = find_by_scraper_file(file)
-          unless scraper
-            name = File.basename(file, '.rb').humanize
-            scraper = Scraper.new(:scraper_file => file, :namespace => namespace, :name => name)
-            scraper.save!
-          end
-          scraper
-        end
-        [namespace, scrapers]
-      end
-    end
-    
     def schedule_code
       code = ['set :output, "#{RAILS_ROOT}/log/whenever_cron.log"' + "\n" ]
       find_each {|scraper| code << scraper.schedule_code }
@@ -53,7 +31,7 @@ class Scraper < ActiveRecord::Base
   end
 
   def scraper_path
-    scraper_file.sub("#{Scraper.scrapers_dir}",'')
+    scraper_file.sub("#{Scraper.code_dir}",'')
   end
 
   def schedule_code
@@ -71,7 +49,7 @@ class Scraper < ActiveRecord::Base
     open(scraper_file).read
   end
 
-  def run_scraper
+  def run
     commit_at_end = true # always commit at end
     result = scrape_results.create
     result.commit_result = !commit_at_end

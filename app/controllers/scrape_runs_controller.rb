@@ -16,7 +16,7 @@ class ScrapeRunsController < ActionController::Base
       render :status => '400', :text => ''
     end
   end
-  
+
   private
     def find_web_resource
       @web_resource_id = params[:web_resource_id]

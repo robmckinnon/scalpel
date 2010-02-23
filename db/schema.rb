@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100221220008) do
+ActiveRecord::Schema.define(:version => 20100223145734) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -44,9 +44,11 @@ ActiveRecord::Schema.define(:version => 20100221220008) do
     t.string   "parser_file"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "scraper_id"
   end
 
   add_index "parsers", ["parser_file"], :name => "index_parsers_on_parser_file"
+  add_index "parsers", ["scraper_id"], :name => "index_parsers_on_scraper_id"
 
   create_table "scrape_results", :force => true do |t|
     t.integer  "scraper_id"
