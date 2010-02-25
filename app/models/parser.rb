@@ -13,4 +13,12 @@ class Parser < ActiveRecord::Base
       '_parse'
     end
   end
+
+  def run
+    scrape_result = scraper.last_scrape_result
+    parser = code_instance
+    
+    parser.perform scrape_result
+  end
+
 end

@@ -30,6 +30,10 @@ class Scraper < ActiveRecord::Base
     end
   end
 
+  def last_scrape_result
+    scrape_results.last
+  end
+
   def scraper_path
     scraper_file.sub("#{Scraper.code_dir}",'')
   end

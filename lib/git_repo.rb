@@ -107,6 +107,13 @@ class GitRepo
 
       git_commit_sha = commit ? commit.id : nil
     end
+    
+    def data git_commit_sha, git_path
+      commit = git_repo.commit git_commit_sha
+      blob = commit ? (commit.tree / git_path) : nil
+      blob ? blob.data : nil
+    end
+
   end
-      
+
 end

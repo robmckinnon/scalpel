@@ -41,16 +41,15 @@ class WebResource < ActiveRecord::Base
   end
 
   def contents
-    if commit = last_commit
-      blob = commit ? (commit.tree / git_path) : nil
-      blob ? blob.data : nil
+    if data = GitRepo.data(git_commit_sha, git_path)
+      data
     elsif file_path && File.exist?(file_path)
       IO.read(file_path)
     else
       nil
     end
   end
-  
+
   def hpricot_doc
     if contents
       @doc ||= Hpricot contents

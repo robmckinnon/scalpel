@@ -1,17 +1,15 @@
 require 'hpricot'
 
 class ScrapedResource < ActiveRecord::Base
-  
+
   belongs_to :web_resource
   belongs_to :scrape_result
 
   def contents
-    repo = ScrapeRunJob.git_repo
-    commit = repo.commit git_commit_sha
-    blob = commit ? (commit.tree / git_path) : nil
-    blob ? blob.data : nil
+    # GitRepo.data git_commit_sha, git_path
+    web_resource.contents
   end
-  
+
   def hpricot_doc
     if contents
       @doc ||= Hpricot contents
