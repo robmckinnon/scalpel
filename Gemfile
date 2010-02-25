@@ -14,6 +14,8 @@ gem 'syntax'
 gem 'hpricot'
 gem 'morph'
 gem 'whenever'
+gem 'twfy'
+# gem 'mechanize'
 
 group :test do
   gem 'rspec'
