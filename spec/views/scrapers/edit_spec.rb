@@ -7,6 +7,7 @@ describe "/scrapers/edit.html.haml" do
     @scraper = mock_model(Scraper)
     @scraper.stub!(:name).and_return("MyString")
     @scraper.stub!(:namespace).and_return("namespace")
+    @scraper.stub!(:schedule_every).and_return("1.day")
     @scraper.stub!(:scraper_file).and_return("scraper_file")
     assigns[:scraper] = @scraper
 

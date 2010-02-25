@@ -9,6 +9,7 @@ describe "/scrapers/new.html.haml" do
     @scraper.stub!(:name).and_return("MyString")
     @scraper.stub!(:namespace).and_return("namespace")
     @scraper.stub!(:scraper_file).and_return("scraper_file")
+    @scraper.stub!(:schedule_every).and_return("1.day")
     @scraper.stub!(:pdftotext_layout).and_return(false)
     assigns[:scraper] = @scraper
 

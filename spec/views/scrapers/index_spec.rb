@@ -6,8 +6,10 @@ describe "/scrapers/index.html.haml" do
   before(:each) do
     scraper_98 = mock_model(Scraper)
     scraper_98.should_receive(:name).and_return("MyString")
+    scraper_98.stub!(:schedule_every).and_return("1.day")
     scraper_99 = mock_model(Scraper)
     scraper_99.should_receive(:name).and_return("MyString")
+    scraper_99.stub!(:schedule_every).and_return("1.day")
 
     assigns[:scrapers_by_namespace] = [['n1',[scraper_98]], ['n2',[scraper_99]]]
 
