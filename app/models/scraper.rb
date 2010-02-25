@@ -66,8 +66,4 @@ class Scraper < ActiveRecord::Base
     result.save
   end
 
-  def first_run?
-    scrape_results.empty?
-  end
-  
 end
