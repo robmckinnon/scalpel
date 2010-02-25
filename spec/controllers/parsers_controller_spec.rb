@@ -4,8 +4,10 @@ describe ParsersController do
   describe "handling GET /parsers" do
 
     before(:each) do
+      @namespace = 'namespace'
       @parser = mock_model(Parser)
-      Parser.stub!(:find).and_return([@parser])
+      @code_by_namespace = [ [@namespace, [@parser]] ]
+      Parser.stub!(:code_by_namespace).and_return(@code_by_namespace)
     end
   
     def do_get
@@ -23,13 +25,13 @@ describe ParsersController do
     end
   
     it "should find all parsers" do
-      Parser.should_receive(:find).with(:all).and_return([@parser])
+      Parser.should_receive(:code_by_namespace).and_return(@code_by_namespace)
       do_get
     end
   
     it "should assign the found parsers for the view" do
       do_get
-      assigns[:parsers].should == [@parser]
+      assigns[:parsers_by_namespace].should == @code_by_namespace
     end
   end
 
