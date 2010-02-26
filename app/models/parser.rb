@@ -17,8 +17,21 @@ class Parser < ActiveRecord::Base
   def run
     scrape_result = scraper.last_scrape_result
     parser = code_instance
-    
+
     parser.perform scrape_result
+  end
+  
+  def populate_scraper
+    unless scraper_id
+      scraper_file = parser_file.gsub('parse','scrape')
+      if File.exist?(scraper_file)
+        scraper = Scraper.find_by_scraper_file(scraper_file)
+        if scraper
+          self.scraper_id = scraper.id
+          save!
+        end
+      end
+    end
   end
 
 end
