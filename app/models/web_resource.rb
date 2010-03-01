@@ -9,13 +9,14 @@ class WebResource < ActiveRecord::Base
   has_many :scrape_runs
 
   class << self
-    def scrape uri, &block
+    def scrape uri, result=nil, &block
       web_resource = find_or_create_by_uri(uri)
       if web_resource.scrape_runs.empty?
         web_resource.scrape_runs = []
         web_resource.save!
       end
       web_resource.do_scrape &block # synchronous call
+      result.add_working_file(web_resource) if result
       web_resource
     end
   end
