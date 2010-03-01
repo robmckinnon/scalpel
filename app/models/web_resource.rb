@@ -9,7 +9,7 @@ class WebResource < ActiveRecord::Base
   has_many :scrape_runs
 
   class << self
-    def scrape uri, result=nil, &block
+    def scrape uri, result, &block
       web_resource = find_or_create_by_uri(uri)
       if web_resource.scrape_runs.empty?
         web_resource.scrape_runs = []
