@@ -89,8 +89,13 @@ class ScrapeRunJob
       headers[:content_type][/^application\/pdf/] ? true : false
     end
 
-    def headers_text(uri, headers)
-      {:uri => uri}.merge(headers).to_yaml.sort
+    def headers_text(uri, response)
+      hash = response.headers.merge({:uri => uri,
+          :response_code => response.code,
+          :response_message => response.net_http_res.message})
+      array = hash.to_a.sort{|a,b| a[0].to_s <=> b[0].to_s}
+      ordered_map = YAML::Omap.new(array)
+      ordered_map.to_yaml
     end
 
     def http_callback response, uri, &block
@@ -108,17 +113,17 @@ class ScrapeRunJob
       handle_response_text response, response_text, response_file, body_file, uri, response.headers
     end
     
-    def handle_response_text response, response_text, response_file, body_file, uri, headers
+    def handle_response_text response, response_text, response_file, body_file, uri
       commit_sha = nil
       git_path = GitRepo.relative_git_path(response_file)
 
       unless no_need_to_update?(response_text)
         headers_file = "#{body_file}.response.yml"
-        GitRepo.write_file(headers_file, headers_text(uri, headers))
+        GitRepo.write_file(headers_file, headers_text(uri, response))
         GitRepo.write_file(response_file, response_text)
       end
 
-      update_scrape_run scrape_run_attributes(uri, response, headers, body_file, git_path, commit_sha)
+      update_scrape_run scrape_run_attributes(uri, response, response.headers, body_file, git_path, commit_sha)
     end
     
     def last_contents

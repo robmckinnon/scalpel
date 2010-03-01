@@ -21,6 +21,12 @@ class ScrapeResult < ActiveRecord::Base
     end
   end
   
+  def untracked_resources
+    resource_by_path = scraped_resources.group_by(&:git_path)
+    untracked_paths = GitRepo.select_untracked(resource_by_path.keys)
+    untracked_paths.collect { |path| resource_by_path[path] }.flatten
+  end
+
   private
     def set_start_time
       self.start_time = Time.now

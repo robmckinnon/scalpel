@@ -80,6 +80,33 @@ class GitRepo
       end      
     end
 
+    def status
+      repo.status
+    end
+    
+    def each_status_type &block
+      the_status = status
+      [:added, :changed, :deleted, :untracked].each do |type|
+        files = the_status.send(type)
+        yield type, files
+      end
+    end
+
+    # returns hash of untracked files, key is git_path
+    def untracked_hash
+      untracked = repo.status.untracked
+      untracked = untracked.inject({}) do |hash, item|
+        hash[item[0]] = item[1]
+        hash
+      end
+    end
+
+    # returns list of git_paths that are untracked
+    def select_untracked git_paths
+      untracked = untracked_hash
+      git_paths.select {|git_path| untracked[git_path] }
+    end
+
     # adds relative git_path to git repository, but does not commit
     def add_to_git git_path
       puts "adding: #{git_path}"
