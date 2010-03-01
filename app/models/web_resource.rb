@@ -20,6 +20,10 @@ class WebResource < ActiveRecord::Base
     end
   end
   
+  def headers_file
+    "#{file_path}.response.yml"
+  end
+
   # start scrape - asynchronous
   def start_scrape
     scrape_run = scrape_runs.create

@@ -32,8 +32,4 @@ class ScrapeRun < ActiveRecord::Base
       web_resource.save
     end
   end
-
-  def headers_file
-    "#{file_path}.response.yml"
-  end
 end

@@ -64,7 +64,7 @@ class GitRepo
     end
 
     def relative_git_path file
-      file.sub(git_dir,'').sub(/^\//,'')
+      file ? file.sub(git_dir,'').sub(/^\//,'') : nil
     end
 
     def rescue_if_git_timeout &block

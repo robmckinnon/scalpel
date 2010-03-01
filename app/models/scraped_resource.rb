@@ -23,13 +23,8 @@ class ScrapedResource < ActiveRecord::Base
   end
   
   def headers_file
-    if web_resource_id && git_path && git_commit_sha
-      run = ScrapeRun.find_by_web_resource_id_and_git_path_and_git_commit_sha(web_resource_id, git_path, git_commit_sha)
-      if run
-        run.headers_file
-      else
-        nil
-      end
+    if web_resource_id
+      web_resource.headers_file
     else
       nil
     end
