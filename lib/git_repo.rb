@@ -80,13 +80,10 @@ class GitRepo
       end      
     end
 
-    # adds to git repository, but does not commit, returns git_path
-    def add_to_git file_name, text
-      write_file(file_name, text)
-      git_path = relative_git_path(file_name)
+    # adds relative git_path to git repository, but does not commit
+    def add_to_git git_path
       puts "adding: #{git_path}"
       repo.add(git_path)
-      git_path
     end
 
     # commits to git repository, add_to_git must be called first, returns git_commit_sha

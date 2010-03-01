@@ -111,14 +111,16 @@ class ScrapeRunJob
     
     def handle_response_text response, response_text, response_file, body_file, uri, headers
       commit_sha = nil
+      git_path = GitRepo.relative_git_path(response_file)
 
-      if no_need_to_update?(response_text)
-        git_path = GitRepo.relative_git_path(response_file)
-      else
+      unless no_need_to_update?(response_text)
         headers_file = "#{body_file}.response.yml"
-        GitRepo.add_to_git(headers_file, headers_text(uri, headers))
-        git_path = GitRepo.add_to_git(response_file, response_text)
+        GitRepo.write_file(headers_file, headers_text(uri, headers))
+        GitRepo.write_file(response_file, response_text)
+        
         if @commit_result
+          GitRepo.add_to_git(GitRepo.relative_git_path(headers_file))
+          GitRepo.add_to_git(git_path)
           message = "committing: #{git_path} [#{headers[:date]}]"
           commit_sha = GitRepo.commit_to_git(message)
         end
