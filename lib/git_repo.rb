@@ -133,7 +133,9 @@ class GitRepo
     end
     
     def data git_commit_sha, git_path
-      commit = git_repo.commit git_commit_sha
+      commit = rescue_if_git_timeout do |repository|
+        repository.commit git_commit_sha
+      end
       blob = commit ? (commit.tree / git_path) : nil
       blob ? blob.data : nil
     end

@@ -110,7 +110,7 @@ class ScrapeRunJob
 
       yield response_text if block # process text before saving
       
-      handle_response_text response, response_text, response_file, body_file, uri, response.headers
+      handle_response_text response, response_text, response_file, body_file, uri
     end
     
     def handle_response_text response, response_text, response_file, body_file, uri
