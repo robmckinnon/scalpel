@@ -54,22 +54,18 @@ class Scraper < ActiveRecord::Base
   end
 
   def run
-    commit_at_end = true # always commit at end
     result = scrape_results.create
-    result.commit_result = !commit_at_end
 
     scraper = code_instance
     scraper.perform result
 
-    if commit_at_end
-      result.scraped_resources.each do |resource|
-        GitRepo.add_to_git(GitRepo.relative_git_path(resource.headers_file))
-        GitRepo.add_to_git(resource.git_path)
-      end
-
-      message = "committing run of #{scraper.class.name} [#{Time.now}]"
-      commit_sha = GitRepo.commit_to_git(message)
+    result.scraped_resources.each do |resource|
+      GitRepo.add_to_git(GitRepo.relative_git_path(resource.headers_file))
+      GitRepo.add_to_git(resource.git_path)
     end
+
+    message = "committing run of #{scraper.class.name} [#{Time.now}]"
+    commit_sha = GitRepo.commit_to_git(message)
 
     result.end_time = Time.now
     result.save

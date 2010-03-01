@@ -2,7 +2,7 @@ require 'rest_client'
 
 class ScrapeRunJob
   
-  def initialize scrape_run_id, web_resource, commit_result, asynchronus=false, &block
+  def initialize scrape_run_id, web_resource, asynchronus=false, &block
     @uri = web_resource.uri
     @web_resource_id = web_resource.id
     @scrape_run_id = scrape_run_id
@@ -11,7 +11,6 @@ class ScrapeRunJob
     @before_save_block = block ? block : nil
     @prev_git_commit_sha = web_resource.git_commit_sha
     @prev_git_path = web_resource.git_path
-    @commit_result = commit_result
     @asynchronus = asynchronus
   end
 
@@ -117,13 +116,6 @@ class ScrapeRunJob
         headers_file = "#{body_file}.response.yml"
         GitRepo.write_file(headers_file, headers_text(uri, headers))
         GitRepo.write_file(response_file, response_text)
-        
-        if @commit_result
-          GitRepo.add_to_git(GitRepo.relative_git_path(headers_file))
-          GitRepo.add_to_git(git_path)
-          message = "committing: #{git_path} [#{headers[:date]}]"
-          commit_sha = GitRepo.commit_to_git(message)
-        end
       end
 
       update_scrape_run scrape_run_attributes(uri, response, headers, body_file, git_path, commit_sha)

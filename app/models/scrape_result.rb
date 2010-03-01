@@ -3,8 +3,6 @@ class ScrapeResult < ActiveRecord::Base
   belongs_to :scraper
   has_many :scraped_resources
 
-  attr_accessor :commit_result
-
   before_create :set_start_time
 
   def add web_resource
