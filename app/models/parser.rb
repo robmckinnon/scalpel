@@ -6,6 +6,8 @@ class Parser < ActiveRecord::Base
   
   belongs_to :scraper
 
+  before_save :populate_scraper
+  
   include Acts::NamespacedCodeFile
 
   class << self
@@ -17,7 +19,6 @@ class Parser < ActiveRecord::Base
   def run
     scrape_result = scraper.last_scrape_result
     parser = code_instance
-
     parser.perform scrape_result
   end
   
@@ -28,7 +29,6 @@ class Parser < ActiveRecord::Base
         scraper = Scraper.find_by_scraper_file(scraper_file)
         if scraper
           self.scraper_id = scraper.id
-          save!
         end
       end
     end

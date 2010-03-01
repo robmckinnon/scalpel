@@ -69,6 +69,11 @@ class Scraper < ActiveRecord::Base
 
     result.end_time = Time.now
     result.save
+    
+    if parser
+      puts 'running parser...'
+      parser.run
+    end
   end
 
 end

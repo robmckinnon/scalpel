@@ -140,7 +140,8 @@ class ScrapeRunJob
     
     def http_errback e, uri
       if e.is_a?(RestClient::Exception)
-        data = { 'scrape_run[response_code]' => e.http_code }
+        attribute = @asynchronus ? 'scrape_run[response_code]' : :response_code
+        data = { attribute => e.http_code }
         update_scrape_run data
       else
         puts "#{uri}\n" + e.to_s
