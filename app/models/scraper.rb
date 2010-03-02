@@ -53,13 +53,6 @@ class Scraper < ActiveRecord::Base
     open(scraper_file).read
   end
 
-  def add_untracked_files result
-    result.untracked_resources.each do |resource|
-      GitRepo.add_to_git(GitRepo.relative_git_path(resource.headers_file))
-      GitRepo.add_to_git(resource.git_path)
-    end
-  end
-  
   def commit_message scraper
     changes = []
     GitRepo.each_status_type do |type, files|
@@ -72,12 +65,25 @@ class Scraper < ActiveRecord::Base
     result = scrape_results.create
     scraper = code_instance
     scraper.perform result
-    add_untracked_files result
-
+    
+    resources = result.add_untracked_and_changed_files
     message = commit_message scraper
     commit_sha = GitRepo.commit_to_git(message)
+    puts "commit_sha: #{commit_sha}"
+    
+    if commit_sha
+      resources.each do |resource|
+        resource.git_commit_sha = commit_sha
+        resource.save!
+        if resource.is_a?(ScrapedResource)
+          resource.web_resource.git_commit_sha = commit_sha
+          resource.save!
+        end
+      end
+    end
+    
     result.end_time = Time.now
-    result.save
+    result.save!
 
     if parser
       puts 'running parser...'

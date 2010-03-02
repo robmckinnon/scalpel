@@ -30,16 +30,37 @@ class ScrapeResult < ActiveRecord::Base
     end
   end
   
+  def add_untracked_and_changed_files
+    to_add = untracked_resources + changed_resources
+    to_add.each do |resource|
+      GitRepo.add_to_git(GitRepo.relative_git_path(resource.headers_file))
+      GitRepo.add_to_git(resource.git_path)
+    end
+    to_add
+  end
+
   def untracked_resources
-    untracked(scraped_resources) + untracked(working_files)
+    filter_untracked(scraped_resources) + filter_untracked(working_files)
+  end
+  
+  def changed_resources
+    filter_changed(scraped_resources) + filter_changed(working_files)
   end
 
   private
 
-    def untracked resources
+    def filter_untracked resources
+      filter_by_status :untracked, resources
+    end
+
+    def filter_changed resources
+      filter_by_status :changed, resources
+    end
+
+    def filter_by_status status_type, resources
       resource_by_path = resources.group_by(&:git_path)
-      untracked_paths = GitRepo.select_untracked(resource_by_path.keys)    
-      untracked_paths.collect { |path| resource_by_path[path] }.flatten
+      paths = GitRepo.select_by_status(status_type, resource_by_path.keys)    
+      paths.collect { |path| resource_by_path[path] }.flatten
     end
 
     def set_start_time

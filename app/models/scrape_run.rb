@@ -24,7 +24,6 @@ class ScrapeRun < ActiveRecord::Base
     if !etag.blank? || !last_modified.blank? || !git_commit_sha.blank? || !git_path.blank?
       web_resource.etag = etag
       web_resource.last_modified = last_modified
-      web_resource.git_commit_sha = git_commit_sha if git_commit_sha
 
       web_resource.file_path = file_path if file_path
       web_resource.git_path = git_path if git_path

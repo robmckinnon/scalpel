@@ -1,10 +1,25 @@
 require 'uri'
 require 'fileutils'
 require 'grit'
+require 'process_lock'
 
 class GitRepo
 
   class << self
+    def aquire_lock
+      lock = ProcessLock.new(RAILS_ROOT + "/git_repo_lock.txt")
+      if lock.owner?
+        return
+      else
+        aquired = lock.aquire!
+        while !aquired
+          sleep 5
+          lock.alive?
+          aquired = lock.aquire!
+        end
+      end
+    end
+
     def data_git_dir= dir
       FileUtils.mkdir_p dir unless File.exist? dir
       @data_git_dir = dir
@@ -24,6 +39,7 @@ class GitRepo
     
     def git_repo force=false
       if !@repo || force
+        aquire_lock
         Dir.chdir git_dir
         @repo = Grit::Repo.new('.')
       end
@@ -92,21 +108,21 @@ class GitRepo
       end
     end
 
-    # returns hash of untracked files, key is git_path
-    def untracked_hash
-      untracked = repo.status.untracked
-      untracked = untracked.inject({}) do |hash, item|
+    # returns hash of files with status_type, key is git_path
+    def status_hash status_type
+      state = repo.status.send(status_type)
+      state.inject({}) do |hash, item|
         hash[item[0]] = item[1]
         hash
       end
     end
 
-    # returns list of git_paths that are untracked
-    def select_untracked git_paths
-      untracked = untracked_hash
-      git_paths.select {|git_path| untracked[git_path] }
+    # returns list of git_paths that have specified status_type
+    def select_by_status status_type, git_paths
+      status = status_hash(status_type)
+      git_paths.select {|git_path| status[git_path] }
     end
-
+    
     # adds relative git_path to git repository, but does not commit
     def add_to_git git_path
       puts "adding: #{git_path}"
