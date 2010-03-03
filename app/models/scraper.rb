@@ -53,9 +53,9 @@ class Scraper < ActiveRecord::Base
     open(scraper_file).read
   end
 
-  def commit_message scraper
+  def commit_message repo, scraper
     changes = []
-    GitRepo.each_status_type do |type, files|
+    repo.each_status_type do |type, files|
       changes << "#{type}: #{files.size}" if (files.size > 0)
     end
     message = "committing run of #{scraper.class.name} [#{Time.now}] (#{changes.join(", ")})"
@@ -83,14 +83,21 @@ class Scraper < ActiveRecord::Base
     end
   end
 
-  def run
-    result = scrape_results.create
+  def run do_scrape=true
     scraper = code_instance
-    scraper.perform result
+
+    if do_scrape
+      result = scrape_results.create
+      scraper.perform result
+    else
+      result = scrape_results.last
+    end
     
+    resources = []
+    commit_sha = nil
     GitRepo.while_locked do |repo|
       resources = add_untracked_and_changed_files repo, result
-      message = commit_message scraper
+      message = commit_message(repo, scraper)
       commit_sha = repo.commit_to_git(message)
     end
     

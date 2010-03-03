@@ -41,16 +41,12 @@ class GitRepo
       @git_dir
     end
     
-    def git_repo force=false
+    def repo force=false
       if !@repo || force
         Dir.chdir git_dir
         @repo = Grit::Repo.new('.')
       end
       @repo
-    end
-
-    def repo force=false
-      git_repo force
     end
 
     def file_name uri
@@ -79,7 +75,7 @@ class GitRepo
     def write_file name, contents
       File.open(name, 'w') do |f|
         f.write contents
-      end      
+      end
     end
 
     def relative_git_path file
@@ -88,13 +84,13 @@ class GitRepo
 
     def rescue_if_git_timeout &block
       begin
-        yield repo
+        yield(repo)
       rescue Grit::Git::GitTimeout => e
-        puts e.class.name
         puts e.to_s
         puts e.backtrace.select{|x| x[/app\/models/]}.join("\n")
         sleep 5
         repo(force=true)
+        puts 'trying again ...'
         rescue_if_git_timeout &block
       end      
     end

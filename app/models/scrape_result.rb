@@ -4,8 +4,9 @@ class ScrapeResult < ActiveRecord::Base
   has_many :scraped_resources
 
   before_create :set_start_time, :initialize_working_files
-
+  
   def working_files
+    @working_files ||= {}
     @working_files.keys
   end
 
