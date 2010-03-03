@@ -63,10 +63,9 @@ class Scraper < ActiveRecord::Base
   
   def add_untracked_and_changed_files repo, result
     to_add = result.untracked_resources + result.changed_resources
-    to_add.each do |resource|
-      repo.add_to_git(repo.relative_git_path(resource.headers_file))
-      repo.add_to_git(resource.git_path)
-    end
+    paths = to_add.collect { |resource| repo.relative_git_path(resource.headers_file) }
+    paths += to_add.collect { |resource| resource.git_path }    
+    repo.add_to_git(paths)    
     to_add
   end
 
