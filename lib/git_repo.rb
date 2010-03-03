@@ -6,20 +6,24 @@ require 'process_lock'
 class GitRepo
 
   class << self
-    def aquire_lock
+    
+    def while_locked &block
       lock = ProcessLock.new(RAILS_ROOT + "/git_repo_lock.txt")
-      if lock.owner?
-        return
-      else
-        aquired = lock.aquire!
-        while !aquired
-          sleep 5
-          lock.alive?
-          aquired = lock.aquire!
-        end
+      while !lock.owner?             # loop while not owner
+        lock.aquire! if !lock.alive? # aquire lock if it's not alive
+        sleep 5 if !lock.owner?      # wait if lock not aquired
       end
-    end
 
+      if lock.owner?
+        yield(self)
+      else
+        while_locked &block
+      end
+
+      ensure
+        lock.release!
+    end
+    
     def data_git_dir= dir
       FileUtils.mkdir_p dir unless File.exist? dir
       @data_git_dir = dir
@@ -39,7 +43,6 @@ class GitRepo
     
     def git_repo force=false
       if !@repo || force
-        aquire_lock
         Dir.chdir git_dir
         @repo = Grit::Repo.new('.')
       end
@@ -126,7 +129,9 @@ class GitRepo
     # adds relative git_path to git repository, but does not commit
     def add_to_git git_path
       puts "adding: #{git_path}"
-      repo.add(git_path)
+      rescue_if_git_timeout do |repository|
+        repository.add(git_path)
+      end
     end
 
     # commits to git repository, add_to_git must be called first, returns git_commit_sha

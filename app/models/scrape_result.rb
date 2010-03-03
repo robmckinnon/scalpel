@@ -29,15 +29,6 @@ class ScrapeResult < ActiveRecord::Base
       false
     end
   end
-  
-  def add_untracked_and_changed_files
-    to_add = untracked_resources + changed_resources
-    to_add.each do |resource|
-      GitRepo.add_to_git(GitRepo.relative_git_path(resource.headers_file))
-      GitRepo.add_to_git(resource.git_path)
-    end
-    to_add
-  end
 
   def untracked_resources
     filter_untracked(scraped_resources) + filter_untracked(working_files)

@@ -61,17 +61,18 @@ class Scraper < ActiveRecord::Base
     message = "committing run of #{scraper.class.name} [#{Time.now}] (#{changes.join(", ")})"
   end
   
-  def run
-    result = scrape_results.create
-    scraper = code_instance
-    scraper.perform result
-    
-    resources = result.add_untracked_and_changed_files
-    message = commit_message scraper
-    commit_sha = GitRepo.commit_to_git(message)
-    puts "commit_sha: #{commit_sha}"
-    
+  def add_untracked_and_changed_files repo, result
+    to_add = result.untracked_resources + result.changed_resources
+    to_add.each do |resource|
+      repo.add_to_git(repo.relative_git_path(resource.headers_file))
+      repo.add_to_git(resource.git_path)
+    end
+    to_add
+  end
+
+  def set_commit_sha_on_resources commit_sha, resources
     if commit_sha
+      puts "commit_sha: #{commit_sha}"
       resources.each do |resource|
         resource.git_commit_sha = commit_sha
         resource.save!
@@ -81,6 +82,20 @@ class Scraper < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def run
+    result = scrape_results.create
+    scraper = code_instance
+    scraper.perform result
+    
+    GitRepo.while_locked do |repo|
+      resources = add_untracked_and_changed_files repo, result
+      message = commit_message scraper
+      commit_sha = repo.commit_to_git(message)
+    end
+    
+    set_commit_sha_on_resources commit_sha, resources
     
     result.end_time = Time.now
     result.save!
