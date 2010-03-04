@@ -22,6 +22,10 @@ class ScrapedResource < ActiveRecord::Base
     contents ? (hpricot_doc/'a') : []
   end
   
+  def headers_git_path
+    GitRepo.relative_git_path(headers_file)
+  end
+
   def headers_file
     if web_resource_id
       web_resource.headers_file

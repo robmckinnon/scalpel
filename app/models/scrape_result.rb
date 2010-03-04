@@ -31,25 +31,38 @@ class ScrapeResult < ActiveRecord::Base
     end
   end
 
-  def untracked_resources
-    filter_untracked(scraped_resources) + filter_untracked(working_files)
+  def files_to_add
+    (untracked_files + changed_files).sort
   end
-  
-  def changed_resources
-    filter_changed(scraped_resources) + filter_changed(working_files)
+
+  def resources_to_add
+    untracked_resources + changed_resources
   end
 
   private
 
-    def filter_untracked resources
-      filter_by_status :untracked, resources
+    def untracked_files
+      filter_by_status(:untracked, scraped_resources + working_files)
     end
 
-    def filter_changed resources
-      filter_by_status :changed, resources
+    def changed_files
+      filter_by_status(:changed, scraped_resources + working_files)
     end
 
     def filter_by_status status_type, resources
+      paths = resources.collect(&:git_path) + resources.collect(&:headers_git_path)
+      GitRepo.select_by_status(status_type, paths)
+    end
+
+    def untracked_resources
+      filter_resources_by_status(:untracked, scraped_resources + working_files)
+    end
+
+    def changed_resources
+      filter_resources_by_status(:changed, scraped_resources + working_files)
+    end
+
+    def filter_resources_by_status status_type, resources
       resource_by_path = resources.group_by(&:git_path)
       paths = GitRepo.select_by_status(status_type, resource_by_path.keys)    
       paths.collect { |path| resource_by_path[path] }.flatten
@@ -58,7 +71,7 @@ class ScrapeResult < ActiveRecord::Base
     def set_start_time
       self.start_time = Time.now
     end
-    
+
     def initialize_working_files
       @working_files = {}
     end

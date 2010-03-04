@@ -126,9 +126,12 @@ class GitRepo
     
     # adds relative git_path to git repository, but does not commit
     def add_to_git *git_paths
-      puts "adding: #{git_paths.join('  ')}"
-      rescue_if_git_timeout do |repository|
-        repository.add(git_paths)
+      git_paths.flatten.in_groups_of(10).each do |paths|
+        paths = paths.compact
+        puts "adding: #{paths.join('  ')}"
+        rescue_if_git_timeout do |repository|
+          repository.add(paths)
+        end
       end
     end
 
