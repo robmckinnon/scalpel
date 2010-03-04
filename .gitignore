@@ -6,6 +6,7 @@ vendor/plugins
 vendor/bundler_gems
 test
 config/database.yml
+config/twfy_key.txt
 .DS_Store
 doc
 log

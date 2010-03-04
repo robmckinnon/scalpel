@@ -96,7 +96,9 @@ class GitRepo
     end
 
     def status
-      repo.status
+      rescue_if_git_timeout do |repository|
+        repository.status
+      end
     end
     
     def each_status_type &block
