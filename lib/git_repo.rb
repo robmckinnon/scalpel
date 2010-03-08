@@ -87,11 +87,12 @@ class GitRepo
         yield(repo)
       rescue Grit::Git::GitTimeout => e
         puts e.to_s
-        puts e.backtrace.select{|x| x[/app\/models/]}.join("\n")
+        puts e.backtrace.select{|x| x[/(app\/models|lib\/)/]}.join("\n")
         sleep 5
         repo(force=true)
         puts 'trying again ...'
         rescue_if_git_timeout &block
+        puts '... suceeded'
       end      
     end
 
@@ -111,7 +112,7 @@ class GitRepo
 
     # returns hash of files with status_type, key is git_path
     def status_hash status_type
-      state = repo.status.send(status_type)
+      state = status.send(status_type)
       state.inject({}) do |hash, item|
         hash[item[0]] = item[1]
         hash
