@@ -62,11 +62,17 @@ class Scraper < ActiveRecord::Base
   end
   
   def add_untracked_and_changed_files repo, result
-    to_add = result.untracked_resources + result.changed_resources
-    paths = to_add.collect { |resource| repo.relative_git_path(resource.headers_file) }
-    paths += to_add.collect { |resource| resource.git_path }    
-    repo.add_to_git(paths)    
-    to_add
+    resources = result.resources_to_add
+    files = result.files_to_add
+
+    while files.size > 0
+      puts "adding #{files.size} files to git"
+      repo.add_to_git(files)
+      files = result.files_to_add
+      puts "***\n #{files.size} files didn't get added: #{files.inspect}" unless files.empty?
+    end
+
+    resources
   end
 
   def set_commit_sha_on_resources commit_sha, resources
@@ -102,7 +108,7 @@ class Scraper < ActiveRecord::Base
     end
     
     set_commit_sha_on_resources commit_sha, resources
-    
+
     result.end_time = Time.now
     result.save!
 

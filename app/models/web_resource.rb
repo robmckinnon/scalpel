@@ -21,6 +21,10 @@ class WebResource < ActiveRecord::Base
     end
   end
   
+  def headers_git_path
+    GitRepo.relative_git_path(headers_file)
+  end
+
   def headers_file
     "#{file_path}.response.yml"
   end
@@ -40,10 +44,10 @@ class WebResource < ActiveRecord::Base
     nil
   end
   
-  def last_commit
-    repo = GitRepo.git_repo
-    repo.commit git_commit_sha
-  end
+  # def last_commit
+    # repo = GitRepo.git_repo
+    # repo.commit git_commit_sha
+  # end
 
   def contents
     if data = GitRepo.data(git_commit_sha, git_path)
