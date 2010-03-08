@@ -24,3 +24,6 @@ Gemfile.lock
 config/schedule.rb
 tmp
 git_repo_lock.txt
+*-data
+script/parse
+script/scrape

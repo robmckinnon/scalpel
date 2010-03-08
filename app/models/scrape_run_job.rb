@@ -78,10 +78,12 @@ class ScrapeRunJob
       end
     end
 
-    def pdf_to_text body_file, response_body
-      GitRepo.write_file body_file, response_body
-      text_file = "#{body_file}.txt"
-      `pdftotext -enc UTF-8 -layout #{file} #{text_file}`
+    def pdf_to_text pdf_file, response_body
+      GitRepo.write_file pdf_file, response_body
+      text_file = "#{pdf_file}.txt"
+      cmd = "pdftotext -enc UTF-8 -layout #{pdf_file} #{text_file}"
+      puts cmd
+      `#{cmd}`
       text_file
     end
     
@@ -100,10 +102,14 @@ class ScrapeRunJob
 
     def http_callback response, uri, &block
       body_file = GitRepo.uri_file_name(uri, response.headers[:content_type])
+      puts body_file
       if is_pdf?(response.headers)
+        puts 'pdf'
+        
         response_file = pdf_to_text(body_file, response.to_s)
         response_text = IO.read(response_file)
       else
+        puts 'not pdf'
         response_file = body_file
         response_text = response.to_s
       end
@@ -152,5 +158,5 @@ class ScrapeRunJob
         puts "#{uri}\n" + e.to_s
         puts e.backtrace.join("\n")
       end
-    end
+   end
 end

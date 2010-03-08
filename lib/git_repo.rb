@@ -43,6 +43,7 @@ class GitRepo
     
     def repo force=false
       if !@repo || force
+        puts "changing to #{git_dir}"
         Dir.chdir git_dir
         @repo = Grit::Repo.new('.')
       end
@@ -72,7 +73,15 @@ class GitRepo
       file
     end
 
+    def write_parsed path, data
+      name = "#{data_git_dir.sub('scraped','parsed')}/#{path}"
+      write_file name, data
+    end
+    
     def write_file name, contents
+      puts "writing file: #{name}"
+      path = File.dirname name
+      FileUtils.mkdir_p(path) unless File.exist?(path)
       File.open(name, 'w') do |f|
         f.write contents
       end

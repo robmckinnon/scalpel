@@ -15,6 +15,7 @@ gem 'hpricot'
 gem 'morph'
 gem 'whenever'
 gem 'twfy'
+gem 'fastercsv'
 # gem 'mechanize'
 
 group :test do
