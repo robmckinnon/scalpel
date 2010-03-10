@@ -84,6 +84,9 @@ class ScrapeRunJob
       cmd = "pdftotext -enc UTF-8 -layout #{pdf_file} #{text_file}"
       puts cmd
       `#{cmd}`
+      cmd = "pdftotext -enc UTF-8 #{pdf_file} #{text_file.sub('.pdf.txt','.txt')}"
+      puts cmd
+      `#{cmd}`
       text_file
     end
     

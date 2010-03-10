@@ -39,7 +39,7 @@ class ScrapeResult < ActiveRecord::Base
     untracked_resources + changed_resources
   end
 
-  private
+  # private
 
     def untracked_files
       filter_by_status(:untracked, scraped_resources + working_files)
@@ -50,7 +50,9 @@ class ScrapeResult < ActiveRecord::Base
     end
 
     def filter_by_status status_type, resources
-      paths = resources.collect(&:git_path) + resources.collect(&:headers_git_path)
+      paths = resources.collect(&:git_path)
+      paths = paths.collect {|p| p[/\.pdf\.txt$/] ? [p, p.sub('.pdf.txt','.txt')] : p }.flatten
+      paths += resources.collect(&:headers_git_path)
       GitRepo.select_by_status(status_type, paths)
     end
 

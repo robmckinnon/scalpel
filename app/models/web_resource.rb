@@ -9,6 +9,13 @@ class WebResource < ActiveRecord::Base
   has_many :scrape_runs
 
   class << self
+    
+    def scrape_and_add uri, result
+      resource = WebResource.scrape(uri, result)
+      result.add_resource(resource)
+      resource
+    end
+
     def scrape uri, result, &block
       web_resource = find_or_create_by_uri(uri)
       if web_resource.scrape_runs.empty?
@@ -49,11 +56,31 @@ class WebResource < ActiveRecord::Base
     # repo.commit git_commit_sha
   # end
 
-  def contents
-    if data = GitRepo.data(git_commit_sha, git_path)
-      data
-    elsif file_path && File.exist?(file_path)
+  def plain_pdf_contents
+    if git_path[/\.pdf\.txt$/]
+      if file_path && File.exist?(file_path)
+        read_file '.txt'
+      elsif data = GitRepo.data(git_commit_sha, git_path.sub('.pdf.txt','.txt') )
+        data
+      end
+    else
+      nil
+    end
+  end
+
+  def read_file ext
+    if (file_path[/pdf$/] && file_path.sub('.pdf','.txt'))
+      IO.read(file_path.sub('.pdf',ext))
+    else
       IO.read(file_path)
+    end
+  end
+
+  def contents
+    if file_path && File.exist?(file_path)
+      read_file '.pdf.txt'
+    elsif data = GitRepo.data(git_commit_sha, git_path)
+      data
     else
       nil
     end

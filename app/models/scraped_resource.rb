@@ -5,9 +5,17 @@ class ScrapedResource < ActiveRecord::Base
   belongs_to :web_resource
   belongs_to :scrape_result
 
+  def plain_pdf_contents
+    web_resource.plain_pdf_contents
+  end
+
   def contents
     # GitRepo.data git_commit_sha, git_path <- use this instead!!!
     web_resource.contents
+  end
+
+  def uri
+    web_resource.uri
   end
 
   def hpricot_doc

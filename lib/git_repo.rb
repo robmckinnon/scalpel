@@ -51,7 +51,7 @@ class GitRepo
     end
 
     def file_name uri
-      parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub('&','__')}
+      parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub(':','_').gsub('&','__')}
       File.join(data_git_dir, parts)
     end
     
