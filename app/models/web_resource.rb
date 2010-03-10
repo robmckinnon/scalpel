@@ -51,10 +51,14 @@ class WebResource < ActiveRecord::Base
 
   def plain_pdf_contents
     if git_path[/\.pdf\.txt$/]
-      if data = GitRepo.data(git_commit_sha, git_path.sub('.pdf.txt','.txt') )
+      if file_path && File.exist?(file_path)
+        if (file_path[/pdf$/] && file_path.sub('.pdf','.txt'))
+          IO.read(file_path.sub('.pdf','.txt'))
+        else
+          IO.read(file_path)
+        end
+      elsif data = GitRepo.data(git_commit_sha, git_path.sub('.pdf.txt','.txt') )
         data
-      elsif file_path && File.exist?(file_path.sub('.pdf.txt','.txt'))
-        IO.read(file_path.sub('.pdf.txt','.txt'))
       end
     else
       nil
@@ -62,10 +66,10 @@ class WebResource < ActiveRecord::Base
   end
   
   def contents
-    if data = GitRepo.data(git_commit_sha, git_path)
-      data
-    elsif file_path && File.exist?(file_path)
+    if file_path && File.exist?(file_path)
       IO.read(file_path)
+    elsif data = GitRepo.data(git_commit_sha, git_path)
+      data
     else
       nil
     end
