@@ -14,6 +14,10 @@ class ScrapedResource < ActiveRecord::Base
     web_resource.contents
   end
 
+  def uri
+    web_resource.uri
+  end
+
   def hpricot_doc
     if contents
       @doc ||= Hpricot contents
