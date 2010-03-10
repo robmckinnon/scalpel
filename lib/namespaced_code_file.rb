@@ -33,7 +33,8 @@ module Acts
       end
 
       def code_by_namespace
-        Dir.glob("#{code_dir}/*").collect do |directory|
+        directories = Dir.glob("#{code_dir}/*")
+        directories.collect do |directory|
           namespace = directory.split('/').last
           
           codes = Dir.glob("#{directory}/*#{code_suffix}.rb").collect do |file|
