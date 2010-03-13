@@ -106,7 +106,7 @@ class ScrapeRunJob
     def http_callback response, uri, &block
       body_file = GitRepo.uri_file_name(uri, response.headers[:content_type])
       puts body_file
-      if is_pdf?(response.headers)
+      if is_pdf?(response.headers) || uri[/pdf$/]
         puts 'pdf'
         
         response_file = pdf_to_text(body_file, response.to_s)

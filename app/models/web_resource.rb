@@ -70,7 +70,7 @@ class WebResource < ActiveRecord::Base
 
   def read_file ext
     if (file_path[/pdf$/] && file_path.sub('.pdf','.txt'))
-      IO.read(file_path.sub('.pdf',ext))
+      IO.read(file_path.sub(/\.pdf$/,ext))
     else
       IO.read(file_path)
     end

@@ -42,11 +42,11 @@ class GitRepo
     end
     
     def repo force=false
-      if !@repo || force
+      # if !@repo || force
         puts "changing to #{git_dir}"
         Dir.chdir git_dir
         @repo = Grit::Repo.new('.')
-      end
+      # end
       @repo
     end
 
