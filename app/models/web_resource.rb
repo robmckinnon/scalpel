@@ -1,4 +1,6 @@
 require 'hpricot'
+require 'cmess/guess_encoding'
+require 'iconv'
 
 class WebResource < ActiveRecord::Base
 
@@ -81,10 +83,14 @@ class WebResource < ActiveRecord::Base
   end
 
   def read_file ext
-    if (file_path[/pdf$/] && file_path.sub('.pdf','.txt'))
-      IO.read(file_path.sub(/\.pdf$/,ext))
+    if file_path[/pdf$/] && (file_name = file_path.sub(/\.pdf$/,ext))
+      content = IO.read(file_name)
+      charset = CMess::GuessEncoding::Automatic.guess(content) 
+      Iconv.conv('utf-8', charset, content)
     else
-      IO.read(file_path)
+      content = IO.read(file_path)
+      charset = CMess::GuessEncoding::Automatic.guess(content) 
+      Iconv.conv('utf-8', charset, content)
     end
   end
 
