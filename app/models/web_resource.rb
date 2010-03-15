@@ -56,11 +56,23 @@ class WebResource < ActiveRecord::Base
     # repo.commit git_commit_sha
   # end
 
+  def xml_pdf_contents
+    if git_path[/\.pdf\.txt$/]
+      if file_path && File.exist?(file_path)
+        read_file '.xml'
+      elsif data = GitRepo.data(git_commit_sha, git_path.sub(/\.pdf\.txt$/,'.xml') )
+        data
+      end
+    else
+      nil
+    end
+  end
+
   def plain_pdf_contents
     if git_path[/\.pdf\.txt$/]
       if file_path && File.exist?(file_path)
         read_file '.txt'
-      elsif data = GitRepo.data(git_commit_sha, git_path.sub('.pdf.txt','.txt') )
+      elsif data = GitRepo.data(git_commit_sha, git_path.sub(/\.pdf\.txt$/,'.txt') )
         data
       end
     else

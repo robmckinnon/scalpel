@@ -5,6 +5,10 @@ class ScrapedResource < ActiveRecord::Base
   belongs_to :web_resource
   belongs_to :scrape_result
 
+  def xml_pdf_contents
+    web_resource.xml_pdf_contents
+  end
+
   def plain_pdf_contents
     web_resource.plain_pdf_contents
   end
