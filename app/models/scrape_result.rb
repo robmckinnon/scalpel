@@ -5,6 +5,13 @@ class ScrapeResult < ActiveRecord::Base
 
   before_create :set_start_time, :initialize_working_files
   
+  def values_from_line line
+    line.strip!
+    line.gsub!('  ', "\t")
+    line.squeeze!("\t")
+    line.split("\t")
+  end
+
   def working_files
     @working_files ||= {}
     @working_files.keys
