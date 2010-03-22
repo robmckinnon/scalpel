@@ -17,7 +17,7 @@ class Parser < ActiveRecord::Base
   end
 
   def run
-    scrape_result = scraper.last_scrape_result
+    scrape_result = scraper ? scraper.last_scrape_result : nil
     parser = code_instance
     parser.perform scrape_result
   end

@@ -50,7 +50,7 @@ class ScrapeResult < ActiveRecord::Base
     end
 
     def filter_by_status status_type, resources
-      paths = resources.collect(&:git_path)
+      paths = resources.collect(&:git_path).compact
       paths = paths.collect {|p| p[/\.pdf\.txt$/] ? [p, p.sub('.pdf.txt','.txt'), p.sub('.pdf.txt','.xml')] : p }.flatten
       paths += resources.collect(&:headers_git_path)
       GitRepo.select_by_status(status_type, paths)

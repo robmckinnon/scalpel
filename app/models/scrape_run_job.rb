@@ -78,18 +78,9 @@ class ScrapeRunJob
       end
     end
 
-    def run cmd
-      puts cmd
-      `#{cmd}`
-    end
-
     def pdf_to_text pdf_file, response_body
       GitRepo.write_file pdf_file, response_body
-      text_file = "#{pdf_file}.txt"
-      run "pdftotext -enc UTF-8 -layout #{pdf_file} #{text_file}"
-      run "pdftotext -enc UTF-8 #{pdf_file} #{text_file.sub(/\.pdf\.txt$/,'.txt')}"
-      run "pdftohtml -xml #{pdf_file} #{text_file.sub(/\.pdf\.txt$/,'') }"
-      text_file
+      text_file = GitRepo.convert_pdf_file pdf_file      
     end
 
     def is_pdf? headers
