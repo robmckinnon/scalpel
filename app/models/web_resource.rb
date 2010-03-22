@@ -1,4 +1,6 @@
 require 'hpricot'
+require 'cmess/guess_encoding'
+require 'iconv'
 
 class WebResource < ActiveRecord::Base
 
@@ -56,11 +58,23 @@ class WebResource < ActiveRecord::Base
     # repo.commit git_commit_sha
   # end
 
+  def xml_pdf_contents
+    if git_path[/\.pdf\.txt$/]
+      if file_path && File.exist?(file_path)
+        read_file '.xml'
+      elsif data = GitRepo.data(git_commit_sha, git_path.sub(/\.pdf\.txt$/,'.xml') )
+        data
+      end
+    else
+      nil
+    end
+  end
+
   def plain_pdf_contents
     if git_path[/\.pdf\.txt$/]
       if file_path && File.exist?(file_path)
         read_file '.txt'
-      elsif data = GitRepo.data(git_commit_sha, git_path.sub('.pdf.txt','.txt') )
+      elsif data = GitRepo.data(git_commit_sha, git_path.sub(/\.pdf\.txt$/,'.txt') )
         data
       end
     else
@@ -69,10 +83,14 @@ class WebResource < ActiveRecord::Base
   end
 
   def read_file ext
-    if (file_path[/pdf$/] && file_path.sub('.pdf','.txt'))
-      IO.read(file_path.sub('.pdf',ext))
+    if file_path[/pdf$/] && (file_name = file_path.sub(/\.pdf$/,ext))
+      content = IO.read(file_name)
+      charset = CMess::GuessEncoding::Automatic.guess(content) 
+      Iconv.conv('utf-8', charset, content)
     else
-      IO.read(file_path)
+      content = IO.read(file_path)
+      charset = CMess::GuessEncoding::Automatic.guess(content) 
+      Iconv.conv('utf-8', charset, content)
     end
   end
 

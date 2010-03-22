@@ -70,6 +70,7 @@ class Scraper < ActiveRecord::Base
       repo.add_to_git(files)
       files = result.files_to_add
       puts "***\n #{files.size} files didn't get added: #{files.inspect}" unless files.empty?
+      files = [] # temp fix
     end
 
     resources
@@ -112,10 +113,10 @@ class Scraper < ActiveRecord::Base
     result.end_time = Time.now
     result.save!
 
-    if parser
-      puts 'running parser...'
-      parser.run
-    end
+    # if parser
+      # puts 'running parser...'
+      # parser.run
+    # end
     commit_sha
   end
 

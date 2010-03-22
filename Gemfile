@@ -16,6 +16,8 @@ gem 'morph'
 gem 'whenever'
 gem 'twfy'
 gem 'fastercsv'
+gem 'pdf-reader'
+gem 'cmess'
 # gem 'mechanize'
 
 group :test do
