@@ -2,6 +2,8 @@ require 'uri'
 require 'fileutils'
 require 'grit'
 require 'process_lock'
+require 'cmess/guess_encoding'
+require 'iconv'
 
 class GitRepo
 
@@ -85,6 +87,26 @@ class GitRepo
       File.open(name, 'w') do |f|
         f.write contents
       end
+    end
+    
+    def read_file file_name
+      content = IO.read(file_name)
+      charset = CMess::GuessEncoding::Automatic.guess(content) 
+      Iconv.conv('utf-8', charset, content)
+    end
+
+    def run cmd
+      puts cmd
+      `#{cmd}`
+    end
+
+    def convert_pdf_file pdf_file
+      text_file = "#{pdf_file.gsub(' ','_')}.txt"
+      file = pdf_file.gsub(' ','\ ')
+      run "pdftotext -enc UTF-8 -layout #{file} #{text_file}"
+      run "pdftotext -enc UTF-8 #{file} #{text_file.sub(/\.pdf\.txt$/,'.txt')}"
+      run "pdftohtml -xml #{file} #{text_file.sub(/\.pdf\.txt$/,'') }"
+      text_file
     end
 
     def relative_git_path file

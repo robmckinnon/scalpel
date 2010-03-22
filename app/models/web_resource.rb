@@ -1,6 +1,4 @@
 require 'hpricot'
-require 'cmess/guess_encoding'
-require 'iconv'
 
 class WebResource < ActiveRecord::Base
 
@@ -11,7 +9,6 @@ class WebResource < ActiveRecord::Base
   has_many :scrape_runs
 
   class << self
-    
     def scrape_and_add uri, result
       resource = WebResource.scrape(uri, result)
       result.add_resource(resource)
