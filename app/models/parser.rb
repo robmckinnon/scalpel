@@ -14,6 +14,15 @@ class Parser < ActiveRecord::Base
     def code_suffix
       '_parse'
     end
+    
+    def values_from_line line
+      line = String.new line
+      line.strip!
+      line.gsub!('  ', "\t")
+      line.squeeze!("\t")
+      line.split("\t")
+    end
+
   end
 
   def run
