@@ -23,6 +23,30 @@ class Parser < ActiveRecord::Base
       line.split("\t")
     end
 
+    def values_from_bounds line, bounds
+      line = line.ljust(bounds.last)
+      bounds.collect do |bound|
+        if bound.is_a?(Array)
+          line[(bound.first)..(bound.last)].strip
+        else
+          line[bound..(line.length-1)].strip
+        end
+      end
+    end
+    
+    def print_column_histogram results
+      by_col_index = results.group_by {|item| item.first}
+      sorted = by_col_index.keys.sort
+      0.upto(sorted.last) do |index|
+        value = ''
+        at_col = by_col_index[index]      
+        at_col.size.times do |i|
+          item = at_col[i]
+          value += item[1]
+        end if at_col
+        puts "#{index} #{value}"
+      end
+    end
   end
 
   def run
