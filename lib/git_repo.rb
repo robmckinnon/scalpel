@@ -52,25 +52,24 @@ class GitRepo
       @repo
     end
 
-    def file_name uri
+    def file_name uri, content_disposition
       parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub(':','_').gsub('&','__')}
       File.join(data_git_dir, parts)
     end
-    
-    def uri_file_name uri, content_type
+
+    def uri_file_name uri, content_type, content_disposition
       uri_path = URI.parse(uri)
-      file_type = content_type.split('/').last.split(';').first
-
-      if uri_path == '/'
-        uri = "#{uri}index.#{file_type}"
-      end
-      file = file_name(uri)
-      
-      if File.extname(file) == ''
-        file = "#{file}.#{file_type}"
+      if content_disposition[/^attachment; filename=(.+).pdf$/]
+        file_type = 'pdf'
+      else
+        file_type = content_type.split('/').last.split(';').first
       end
 
-      path = File.dirname file
+      uri = "#{uri}index.#{file_type}" if uri_path == '/'
+      file = file_name(uri, content_disposition)      
+      file = "#{file}.#{file_type}" if File.extname(file).blank?
+
+      path = File.dirname(file)
       FileUtils.mkdir_p(path) unless File.exist?(path)
       file
     end
