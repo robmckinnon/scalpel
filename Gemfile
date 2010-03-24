@@ -18,6 +18,7 @@ gem 'twfy'
 gem 'fastercsv'
 gem 'pdf-reader'
 gem 'cmess'
+gem 'google-translate'
 # gem 'mechanize'
 
 group :test do
