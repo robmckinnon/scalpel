@@ -53,13 +53,13 @@ class GitRepo
     end
 
     def file_name uri, content_disposition
-      parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub(':','_').gsub('&','__')}
+      parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub(':','_').gsub('&','__').gsub('(','_').gsub(')','_') }
       File.join(data_git_dir, parts)
     end
 
     def uri_file_name uri, content_type, content_disposition
       uri_path = URI.parse(uri)
-      if content_disposition[/^attachment; filename=(.+).pdf$/]
+      if content_disposition && content_disposition[/^attachment; filename=(.+).pdf$/]
         file_type = 'pdf'
       else
         file_type = content_type.split('/').last.split(';').first
