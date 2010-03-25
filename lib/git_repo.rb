@@ -74,6 +74,11 @@ class GitRepo
       file
     end
 
+    def open_parsed path
+      name = "#{data_git_dir.sub('scraped','parsed')}/#{path}"
+      IO.read(name)
+    end
+
     def write_parsed path, data
       name = "#{data_git_dir.sub('scraped','parsed')}/#{path}"
       write_file name, data

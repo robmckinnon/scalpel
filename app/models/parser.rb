@@ -55,6 +55,11 @@ class Parser < ActiveRecord::Base
     parser.perform scrape_result
   end
   
+  def translate
+    parser = code_instance
+    parser.translate
+  end
+  
   def populate_scraper
     unless scraper_id
       scraper_file = parser_file.gsub('parse','scrape')
