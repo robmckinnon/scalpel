@@ -21,18 +21,19 @@ class ScalpelTranslator
     #          :to => 'en'
     #          :convert => [fields_to_convert]
     def translate_csv csv, options
-      fields_to_translate = options[:translate]
-      fields_to_translate = [fields_to_translate] unless fields_to_translate.is_a?(Array)
       fields_to_convert = options[:convert]
-      fields_to_convert = [fields_to_convert] unless fields_to_convert.is_a?(Array)
+      fields_to_convert = [fields_to_convert].compact unless fields_to_convert.is_a?(Array)
+
+      fields_to_translate = options[:translate]
+      fields_to_translate = [fields_to_translate].compact unless fields_to_translate.is_a?(Array)
       to = options[:to] || 'en'
       from_country_code = options[:from]
-      from = language(country(from_country_code))
-      
+      from = fields_to_translate.empty? ? nil : language(country(from_country_code))
       translator = self.new(from, to)
-      
+
       items = Morph.from_csv csv, 'Item'
       keys = items.first.class.morph_attributes.select {|x| !x.to_s[/^t_/] }
+
       items.each do |item|
         keys.each do |key|
           translator.translate_value(item, key) if fields_to_translate.include?(key)          
