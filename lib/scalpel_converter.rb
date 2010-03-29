@@ -19,7 +19,7 @@ class ScalpelConverter
 
       keys = keys.map do |key|
         if fields_to_convert.include?(key)
-          ["t_#{key}", key]
+          [key, "t_#{key}"]
         else
           key
         end

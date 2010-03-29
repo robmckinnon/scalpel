@@ -24,10 +24,10 @@ describe ScalpelConverter do
 #{@payee2},#{@project2},2009,"#{@amount2}",#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362|
 
 
-@expected = %Q|payee_name,project_title,year_joined,t_public_expenditure_listing,public_expenditure_listing,fund,uri
-#{@payee1},#{@project1},2009,#{@converted_amount1},#{@amount1},#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362
-#{@payee1},#{@project1},2009,0.00,"0,00",#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362
-#{@payee2},#{@project2},2009,#{@converted_amount2},"#{@amount2}",#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362
+@expected = %Q|payee_name,project_title,year_joined,public_expenditure_listing,t_public_expenditure_listing,fund,uri
+#{@payee1},#{@project1},2009,#{@amount1},#{@converted_amount1},#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362
+#{@payee1},#{@project1},2009,"0,00",0.00,#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362
+#{@payee2},#{@project2},2009,"#{@amount2}",#{@converted_amount2},#{@fund},http://www.espa.gr/Shared/Download.aspx?cat=attachments&type=Documents&fileid=362
 |
       end
 
