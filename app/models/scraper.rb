@@ -67,7 +67,7 @@ class Scraper < ActiveRecord::Base
 
     while files.size > 0
       puts "adding #{files.size} files to git"
-      repo.add_to_git(files)
+      repo.add_to_repo(files)
       files = result.files_to_add
       puts "***\n #{files.size} files didn't get added: #{files.inspect}" unless files.empty?
       files = [] # temp fix
@@ -105,7 +105,7 @@ class Scraper < ActiveRecord::Base
     GitRepo.while_locked do |repo|
       resources = add_untracked_and_changed_files repo, result
       message = commit_message(repo, scraper)
-      commit_sha = repo.commit_to_git(message)
+      commit_sha = repo.commit_to_repo(message)
     end
     
     set_commit_sha_on_resources commit_sha, resources

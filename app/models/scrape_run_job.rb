@@ -131,12 +131,7 @@ class ScrapeRunJob
       if @prev_git_commit_sha.blank?
         nil
       else
-        commit = GitRepo.rescue_if_git_timeout do |git_repo|
-          git_repo.commit @prev_git_commit_sha
-        end
-
-        blob = commit ? (commit.tree / @prev_git_path) : nil
-        blob ? blob.data : nil
+        GitRepo.data_from_repo @prev_git_commit_sha, @prev_git_path
       end
     end
 
