@@ -4,11 +4,16 @@ require 'grit'
 require 'process_lock'
 require 'cmess/guess_encoding'
 require 'iconv'
+require 'git'
 
 class GitRepo
 
   class << self
     
+    def log text
+      puts text
+    end
+
     def while_locked &block
       lock = ProcessLock.new(RAILS_ROOT + "/git_repo_lock.txt")
       while !lock.owner?             # loop while not owner
@@ -50,6 +55,11 @@ class GitRepo
       # end
       @repo
     end
+    
+    def git_repo force=false
+      Dir.chdir git_dir
+      @git_repo = Git.open('.')
+    end
 
     def file_name uri, content_disposition
       parts = uri.chomp('/').sub(/^https?:\/\//,'').split(/\/|\?/).collect {|p| p[/^&?(.+)&?$/,1].gsub(':','_').gsub('&','__').gsub('(','_').gsub(')','_').gsub("'",'_') }
@@ -84,7 +94,7 @@ class GitRepo
     end
     
     def write_file name, contents
-      puts "writing file: #{name}"
+      log "writing file: #{name}"
       path = File.dirname name
       FileUtils.mkdir_p(path) unless File.exist?(path)
       File.open(name, 'w') do |f|
@@ -99,7 +109,7 @@ class GitRepo
     end
 
     def run cmd
-      puts cmd
+      log cmd
       `#{cmd}`
     end
 
@@ -120,13 +130,13 @@ class GitRepo
       begin
         yield(repo)
       rescue Grit::Git::GitTimeout => e
-        puts e.to_s
-        puts e.backtrace.select{|x| x[/(app\/models|lib\/)/]}.join("\n")
+        log e.to_s
+        log e.backtrace.select{|x| x[/(app\/models|lib\/)/]}.join("\n")
         sleep 5
         repo(force=true)
-        puts 'trying again ...'
+        log 'trying again ...'
         rescue_if_git_timeout &block
-        puts '... suceeded'
+        log '... suceeded'
       end      
     end
 
@@ -136,8 +146,12 @@ class GitRepo
       end
     end
     
-    def each_status_type &block
-      the_status = status
+    def git_status
+      git_repo.status
+    end
+    
+    def each_git_status_type &block
+      the_status = git_status
       [:added, :changed, :deleted, :untracked].each do |type|
         files = the_status.send(type)
         yield type, files
@@ -145,6 +159,71 @@ class GitRepo
     end
 
     # returns hash of files with status_type, key is git_path
+    def git_status_hash status_type
+      state = git_status.send(status_type)
+      state.inject({}) do |hash, item|
+        hash[item[0]] = item[1]
+        hash
+      end
+    end
+
+    # returns list of git_paths that have specified status_type
+    def select_by_git_status status_type, git_paths
+      status = git_status_hash(status_type)
+      git_paths.select {|git_path| status[git_path] }
+    end
+    
+    # adds relative git_path to git repository, but does not commit
+    def add_to_repo *git_paths
+      git_paths.flatten.in_groups_of(10).each do |paths|
+        paths = paths.compact
+        log "adding: #{paths.join('  ')}"
+        git_repo.add(paths)
+      end
+    end
+
+    def last_commit
+      git_repo.log.first
+    end
+
+    def last_by_message message
+      last = last_commit
+      if last && last.message == message
+        last
+      else
+        raise Exception.new("no commit found for message: #{message}")
+      end
+    end
+
+    # commits to git repository, add_to_git must be called first, returns git_commit_sha
+    def commit_to_repo message
+      log message
+      result = git_repo.commit(message)
+      log "---\n#{result}\n==="
+      commit = last_by_message(message)
+      git_commit_sha = commit ? commit.sha : nil
+    end
+
+    def data_from_repo git_commit_sha, git_path
+      commit = git_repo.gcommit(git_commit_sha)
+      if commit
+        tree = commit.gtree
+        blob = tree.blobs[git_path]
+      else
+        blob = nil
+      end
+        
+      blob ? blob.contents : nil
+    end
+
+    def each_status_type &block
+      the_status = status
+      [:added, :changed, :deleted, :untracked].each do |type|
+        files = the_status.send(type)
+        yield type, files
+      end
+    end
+    
     def status_hash status_type
       state = status.send(status_type)
       state.inject({}) do |hash, item|
@@ -153,30 +232,27 @@ class GitRepo
       end
     end
 
-    # returns list of git_paths that have specified status_type
     def select_by_status status_type, git_paths
       status = status_hash(status_type)
       git_paths.select {|git_path| status[git_path] }
     end
-    
-    # adds relative git_path to git repository, but does not commit
+
     def add_to_git *git_paths
       git_paths.flatten.in_groups_of(10).each do |paths|
         paths = paths.compact
-        puts "adding: #{paths.join('  ')}"
+        log "adding: #{paths.join('  ')}"
         rescue_if_git_timeout do |repository|
           repository.add(paths)
         end
       end
     end
 
-    # commits to git repository, add_to_git must be called first, returns git_commit_sha
     def commit_to_git message
-      puts message
+      log message
       result = rescue_if_git_timeout do |repository|
         repository.commit_index(message)
       end
-      puts "---\n#{result}\n==="
+      log "---\n#{result}\n==="
 
       commit = rescue_if_git_timeout do |repository|
         if result[/nothing added to commit/] || result[/nothing to commit/]
