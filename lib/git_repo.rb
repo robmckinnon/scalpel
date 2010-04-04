@@ -58,7 +58,7 @@ class GitRepo
 
     def uri_file_name uri, content_type, content_disposition
       uri_path = URI.parse(uri)
-      if content_disposition[/^attachment; filename=(.+).pdf$/]
+      if content_disposition && content_disposition[/^attachment; filename=(.+).pdf$/]
         file_type = 'pdf'
       else
         file_type = content_type.split('/').last.split(';').first
@@ -71,6 +71,11 @@ class GitRepo
       path = File.dirname(file)
       FileUtils.mkdir_p(path) unless File.exist?(path)
       file
+    end
+
+    def open_parsed path
+      name = "#{data_git_dir.sub('scraped','parsed')}/#{path}"
+      IO.read(name)
     end
 
     def write_parsed path, data

@@ -28,3 +28,7 @@ git_repo_lock.txt
 *-data
 script/parse
 script/scrape
+groups.csv
+out.txt
+texts.csv
+texts.txt
