@@ -55,7 +55,7 @@ class Scraper < ActiveRecord::Base
 
   def commit_message repo, scraper
     changes = []
-    repo.each_status_type do |type, files|
+    repo.each_git_status_type do |type, files|
       changes << "#{type}: #{files.size}" if (files.size > 0)
     end
     message = "committing run of #{scraper.class.name} [#{Time.now}] (#{changes.join(", ")})"

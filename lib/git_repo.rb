@@ -1,6 +1,5 @@
 require 'uri'
 require 'fileutils'
-require 'grit'
 require 'process_lock'
 require 'cmess/guess_encoding'
 require 'iconv'
@@ -46,14 +45,6 @@ class GitRepo
 
     def git_dir
       @git_dir
-    end
-    
-    def repo force=false
-      # if !@repo || force
-        Dir.chdir git_dir
-        @repo = Grit::Repo.new('.')
-      # end
-      @repo
     end
     
     def git_repo force=false
@@ -126,26 +117,6 @@ class GitRepo
       file ? file.sub(git_dir,'').sub(/^\//,'') : nil
     end
 
-    def rescue_if_git_timeout &block
-      begin
-        yield(repo)
-      rescue Grit::Git::GitTimeout => e
-        log e.to_s
-        log e.backtrace.select{|x| x[/(app\/models|lib\/)/]}.join("\n")
-        sleep 5
-        repo(force=true)
-        log 'trying again ...'
-        rescue_if_git_timeout &block
-        log '... suceeded'
-      end      
-    end
-
-    def status
-      rescue_if_git_timeout do |repository|
-        repository.status
-      end
-    end
-    
     def git_status
       git_repo.status
     end
@@ -214,63 +185,6 @@ class GitRepo
       end
         
       blob ? blob.contents : nil
-    end
-
-    def each_status_type &block
-      the_status = status
-      [:added, :changed, :deleted, :untracked].each do |type|
-        files = the_status.send(type)
-        yield type, files
-      end
-    end
-    
-    def status_hash status_type
-      state = status.send(status_type)
-      state.inject({}) do |hash, item|
-        hash[item[0]] = item[1]
-        hash
-      end
-    end
-
-    def select_by_status status_type, git_paths
-      status = status_hash(status_type)
-      git_paths.select {|git_path| status[git_path] }
-    end
-
-    def add_to_git *git_paths
-      git_paths.flatten.in_groups_of(10).each do |paths|
-        paths = paths.compact
-        log "adding: #{paths.join('  ')}"
-        rescue_if_git_timeout do |repository|
-          repository.add(paths)
-        end
-      end
-    end
-
-    def commit_to_git message
-      log message
-      result = rescue_if_git_timeout do |repository|
-        repository.commit_index(message)
-      end
-      log "---\n#{result}\n==="
-
-      commit = rescue_if_git_timeout do |repository|
-        if result[/nothing added to commit/] || result[/nothing to commit/]
-          nil
-        else
-          repository.commits.detect {|c| c.message == message}
-        end
-      end
-
-      git_commit_sha = commit ? commit.id : nil
-    end
-    
-    def data git_commit_sha, git_path
-      commit = rescue_if_git_timeout do |repository|
-        repository.commit git_commit_sha
-      end
-      blob = commit ? (commit.tree / git_path) : nil
-      blob ? blob.data : nil
     end
 
   end
