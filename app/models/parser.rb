@@ -22,7 +22,7 @@ class Parser < ActiveRecord::Base
       line.squeeze!("\t")
       line.split("\t")
     end
-
+  
   end
 
   def run
