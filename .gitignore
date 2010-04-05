@@ -32,3 +32,9 @@ groups.csv
 out.txt
 texts.csv
 texts.txt
+councillors.csv
+dish_bak/
+lib/r_statistics.rb
+lines.txt
+lobbyist.csv
+sqldump.sql
