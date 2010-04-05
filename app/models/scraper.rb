@@ -32,9 +32,11 @@ class Scraper < ActiveRecord::Base
         file.write schedule_code
       end
       Dir.chdir RAILS_ROOT
-      gem_bin = `gem env | grep 'EXECUTABLE DIRECTORY' | sed s/.*:// | xargs echo`.to_s.strip
-      run "#{gem_bin}/bundle exec whenever --set environment=#{RAILS_ENV} --update-crontab"
-      run "#{gem_bin}/bundle exec whenever --set environment=#{RAILS_ENV}"
+      # gem_bin = `gem env | grep 'EXECUTABLE DIRECTORY' | sed s/.*:// | xargs echo`.to_s.strip
+      # run "#{gem_bin}/bundle exec whenever --set environment=#{RAILS_ENV} --update-crontab"
+      # run "#{gem_bin}/bundle exec whenever --set environment=#{RAILS_ENV}"
+      run "whenever --set environment=#{RAILS_ENV} --update-crontab"
+      run "whenever --set environment=#{RAILS_ENV}"
     end
   end
 

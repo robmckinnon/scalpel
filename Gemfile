@@ -6,7 +6,6 @@ gem 'rails', '2.3.5'
 gem 'haml'
 gem 'friendly_id'
 gem 'resource_controller'
-gem 'mysql', '2.7'
 gem 'delayed_job'
 gem 'rest-client'
 gem 'git'
@@ -21,7 +20,16 @@ gem 'cmess'
 gem 'google-translate'
 # gem 'mechanize'
 
+group :development do
+  gem 'mysql'
+end
+
+group :production do
+  gem 'mysql', '2.7'
+end
+
 group :test do
+  gem 'mysql'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'test-unit', '1.2.3'
