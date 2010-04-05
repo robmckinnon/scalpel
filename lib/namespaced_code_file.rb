@@ -26,7 +26,9 @@ module Acts
         
       def find_by_file file
         logger.info "find by file: #{file}"
-        send("find_by_#{self.name.downcase}_file".to_sym, file)
+        method = "find_by_#{self.name.downcase}_file".to_sym
+        logger.info "method: #{method}"
+        send(method, file)
       end
     
       def code_dir
