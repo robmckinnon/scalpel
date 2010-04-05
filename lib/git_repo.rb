@@ -175,15 +175,29 @@ class GitRepo
       git_commit_sha = commit ? commit.sha : nil
     end
 
-    def data_from_repo git_commit_sha, git_path
-      commit = git_repo.gcommit(git_commit_sha)
-      if commit
-        tree = commit.gtree
-        blob = tree.blobs[git_path]
+    def get_commit git_commit_sha
+      git_repo.gcommit(git_commit_sha)
+    end
+
+    def find_blob_line commit, git_path
+      commit.gtree.full_tree.detect {|x| x[/\t#{git_path}$/] }
+    end
+    
+    def get_blob blob_line
+      if blob_sha = blob_line[/blob (.+)\t/,1]
+        git_repo.gblob(blob_sha)
       else
-        blob = nil
+        nil
       end
-        
+    end
+
+    def data_from_repo git_commit_sha, git_path
+      blob = nil
+      if commit = get_commit(git_commit_sha)
+        if blob_line = find_blob_line(commit, git_path)
+          blob = get_blob blob_line
+        end
+      end
       blob ? blob.contents : nil
     end
 

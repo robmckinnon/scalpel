@@ -100,11 +100,9 @@ class ScrapeRunJob
       body_file = GitRepo.uri_file_name(uri, response.headers[:content_type], response.headers[:content_disposition])
       puts body_file
       if is_pdf?(response.headers) || uri[/pdf$/] || body_file[/pdf$/]
-        puts 'pdf'
         response_file = pdf_to_text(body_file, response.to_s)
         response_text = IO.read(response_file)
       else
-        puts 'not pdf'
         response_file = body_file
         response_text = response.to_s
       end
@@ -114,17 +112,29 @@ class ScrapeRunJob
       handle_response_text response, response_text, response_file, body_file, uri
     end
     
+    def diff str1, str2
+      system "diff #{file_for str1} #{file_for str2}"
+    end
+    
+    def file_for text
+      exp = Tempfile.new("bk", "/tmp").open
+      exp.write(text)
+      exp.close
+      exp.path
+    end
+
     def handle_response_text response, response_text, response_file, body_file, uri
       commit_sha = nil
       git_path = GitRepo.relative_git_path(response_file)
 
       unless no_need_to_update?(response_text)
-        puts "==="
-        puts "needs update"
-        puts "@prev_git_commit_sha: #{@prev_git_commit_sha}"
-        puts "@prev_git_path: #{@prev_git_path}"
-        puts "response_text: #{response_text[0..1000]}"
-        puts "last_contents: #{last_contents[0..1000]}"
+        if @prev_git_path
+          puts "==="
+          puts "needs update"
+          puts "@prev_git_commit_sha: #{@prev_git_commit_sha}"
+          puts "@prev_git_path: #{@prev_git_path}"
+          puts "diff: #{diff(response_text, last_contents)}"
+        end
         headers_file = "#{body_file}.response.yml"
         GitRepo.write_file(headers_file, headers_text(uri, response))
         GitRepo.write_file(response_file, response_text)
@@ -142,7 +152,7 @@ class ScrapeRunJob
     end
 
     def no_need_to_update?(response_text)
-      response_text == last_contents
+      response_text.to_s.strip == last_contents.to_s.strip
     end
     
     def http_errback e, uri
