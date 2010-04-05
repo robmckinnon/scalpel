@@ -23,8 +23,8 @@ class Scraper < ActiveRecord::Base
     end
     
     def run cmd
-      log cmd
-      log `#{cmd}`
+      logger cmd
+      logger `#{cmd}`
     end
 
     def update_crontab
