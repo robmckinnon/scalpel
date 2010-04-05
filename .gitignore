@@ -1,4 +1,5 @@
 Capfile
+config/auth.yml
 config/deploy.rb
 config/passenger
 pdf2xml.dtd
