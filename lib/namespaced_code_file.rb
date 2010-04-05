@@ -28,9 +28,9 @@ module Acts
         logger.info "find by file: #{file}"
         method = "find_by_#{self.name.downcase}_file".to_sym
         logger.info "method: #{method}"
-        send(method, file)
+        self.send(method, file)
       end
-    
+
       def code_dir
         "#{RAILS_ROOT}/lib/#{self.name.downcase.pluralize}"
       end
@@ -39,7 +39,7 @@ module Acts
         directories = Dir.glob("#{code_dir}/*")
         directories.collect do |directory|
           namespace = directory.split('/').last
-          
+
           codes = Dir.glob("#{directory}/*#{code_suffix}.rb").collect do |file|
             code = find_by_file(file)
             logger.info "found: #{code.inspect}"
