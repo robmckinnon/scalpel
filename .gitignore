@@ -1,3 +1,5 @@
+Capfile
+config/deploy.rb
 pdf2xml.dtd
 bin
 .bundle
