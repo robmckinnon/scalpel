@@ -22,7 +22,7 @@ class Scraper < ActiveRecord::Base
       code.join("\n")
     end
     
-    def run cmd
+    def run_cmd cmd
       logger.info cmd
       logger.info `#{cmd}`
     end
@@ -35,8 +35,8 @@ class Scraper < ActiveRecord::Base
       gem_bin = `gem env | grep 'EXECUTABLE DIRECTORY' | sed s/.*:// | xargs echo`.to_s.strip
       # run "#{gem_bin}/bundle exec whenever --set environment=#{RAILS_ENV} --update-crontab"
       # run "#{gem_bin}/bundle exec whenever --set environment=#{RAILS_ENV}"
-      run "#{gem_bin}/whenever --set environment=#{RAILS_ENV} --update-crontab"
-      run "#{gem_bin}/whenever --set environment=#{RAILS_ENV}"
+      run_cmd "#{gem_bin}/whenever --set environment=#{RAILS_ENV} --update-crontab"
+      run_cmd "#{gem_bin}/whenever --set environment=#{RAILS_ENV}"
     end
   end
 
