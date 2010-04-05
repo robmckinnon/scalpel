@@ -25,6 +25,7 @@ module Acts
       end
         
       def find_by_file file
+        logger.info "find by file: #{file}"
         send("find_by_#{self.name.downcase}_file".to_sym, file)
       end
     
@@ -39,6 +40,7 @@ module Acts
           
           codes = Dir.glob("#{directory}/*#{code_suffix}.rb").collect do |file|
             code = find_by_file(file)
+            logger.info "found: #{code.inspect}"
             unless code
               name = File.basename(file, '.rb').humanize
               code = self.new("#{self.name.downcase}_file".to_sym => file, :namespace => namespace, :name => name)
