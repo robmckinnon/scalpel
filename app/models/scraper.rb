@@ -22,13 +22,18 @@ class Scraper < ActiveRecord::Base
       code.join("\n")
     end
     
+    def run cmd
+      log cmd
+      log `#{cmd}`
+    end
+
     def update_crontab
       File.open("#{RAILS_ROOT}/config/schedule.rb", 'w') do |file|
         file.write schedule_code
       end
       Dir.chdir RAILS_ROOT
-      `bundle exec whenever --set environment=#{RAILS_ENV} --update-crontab`
-      `bundle exec whenever --set environment=#{RAILS_ENV}`
+      run "bundle exec whenever --set environment=#{RAILS_ENV} --update-crontab"
+      run "bundle exec whenever --set environment=#{RAILS_ENV}"
     end
   end
 
