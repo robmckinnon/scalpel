@@ -1,5 +1,6 @@
 Capfile
 config/deploy.rb
+config/passenger
 pdf2xml.dtd
 bin
 .bundle
