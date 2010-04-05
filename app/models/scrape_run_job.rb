@@ -119,6 +119,12 @@ class ScrapeRunJob
       git_path = GitRepo.relative_git_path(response_file)
 
       unless no_need_to_update?(response_text)
+        puts "==="
+        puts "needs update"
+        puts "@prev_git_commit_sha: #{@prev_git_commit_sha}"
+        puts "@prev_git_path: #{@prev_git_path}"
+        puts "response_text: #{response_text[0..1000]}"
+        puts "last_contents: #{last_contents[0..1000]}"
         headers_file = "#{body_file}.response.yml"
         GitRepo.write_file(headers_file, headers_text(uri, response))
         GitRepo.write_file(response_file, response_text)
@@ -136,7 +142,7 @@ class ScrapeRunJob
     end
 
     def no_need_to_update?(response_text)
-      response_text == last_contents 
+      response_text == last_contents
     end
     
     def http_errback e, uri

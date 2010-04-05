@@ -77,14 +77,15 @@ class Scraper < ActiveRecord::Base
   end
 
   def set_commit_sha_on_resources commit_sha, resources
-    if commit_sha
+    unless commit_sha.blank?
       puts "commit_sha: #{commit_sha}"
       resources.each do |resource|
         resource.git_commit_sha = commit_sha
         resource.save!
         if resource.is_a?(ScrapedResource)
-          resource.web_resource.git_commit_sha = commit_sha
-          resource.save!
+          web_resource = resource.web_resource
+          web_resource.git_commit_sha = commit_sha
+          web_resource.save!
         end
       end
     end
@@ -104,11 +105,15 @@ class Scraper < ActiveRecord::Base
     commit_sha = nil
     GitRepo.while_locked do |repo|
       resources = add_untracked_and_changed_files repo, result
-      message = commit_message(repo, scraper)
-      commit_sha = repo.commit_to_repo(message)
+      if resources.empty?
+        puts "no resources to commit"
+      else
+        message = commit_message(repo, scraper)
+        commit_sha = repo.commit_to_repo(message)
+      end
     end
-    
-    set_commit_sha_on_resources commit_sha, resources
+        
+    set_commit_sha_on_resources(commit_sha, resources)
 
     result.end_time = Time.now
     result.save!
