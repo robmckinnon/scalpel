@@ -5,6 +5,8 @@ class Scraper < ActiveRecord::Base
   
   has_many :scrape_results
   has_one :parser
+  
+  after_save :update_crontab
 
   include Acts::NamespacedCodeFile
 
@@ -125,4 +127,9 @@ class Scraper < ActiveRecord::Base
     commit_sha
   end
 
+  private
+  
+  def update_crontab
+    Scraper.update_crontab
+  end
 end
