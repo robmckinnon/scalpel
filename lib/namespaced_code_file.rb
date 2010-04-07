@@ -30,7 +30,7 @@ module Acts
       end
 
       def code_dir
-        "#{RAILS_ROOT}/lib/#{self.name.downcase.pluralize}"
+        "#{RAILS_ROOT}/lib/#{self.name.downcase.pluralize}".sub(/releases\/\d+\//,'current/')
       end
 
       def code_by_namespace
