@@ -25,7 +25,7 @@ group :development do
 end
 
 group :production do
-  gem 'mysql', '2.7'
+  gem 'mysql' #, '2.7'
 end
 
 group :test do

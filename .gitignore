@@ -1,4 +1,6 @@
 Capfile
+development
+vendor
 config/auth.yml
 config/deploy.rb
 config/passenger
