@@ -1,4 +1,5 @@
 require 'rest_client'
+require 'mechanize'
 
 class ScrapeRunJob
   
@@ -14,20 +15,23 @@ class ScrapeRunJob
     @asynchronus = asynchronus
   end
 
-  def perform
-    options = {}
+  def perform options={}
     options.merge!({'If-None-Match' => @etag}) if @etag
     options.merge!({'If-Modified-Since' => @last_modified}) if @last_modified
 
-    begin
-      response = RestClient.get @uri, options
-      if @before_save_block
-        http_callback response, @uri, &@before_save_block
-      else
-        http_callback response, @uri
+    if proc = options[:scrape_proc]
+      proc.call(@uri, options, self)
+    else
+      begin
+        response = RestClient.get @uri, options
+        if @before_save_block
+          http_callback response, @uri, &@before_save_block
+        else
+          http_callback response, @uri
+        end
+      rescue Exception => e
+        http_errback e, @uri
       end
-    rescue Exception => e
-      http_errback e, @uri
     end
   end
 
@@ -48,15 +52,15 @@ class ScrapeRunJob
       end
     end
 
-    def scrape_run_attributes uri, response, header, file, relative_git_path, commit_sha
+    def scrape_run_attributes uri, response_code, raw_response_header, header, file, relative_git_path, commit_sha
       if @asynchronus
         {
-          'scrape_run[response_code]' => response.code,
+          'scrape_run[response_code]' => response_code,
           'scrape_run[last_modified]' => header[:last_modified],
           'scrape_run[etag]' => header[:etag],
           'scrape_run[content_type]' => header[:content_type],
           'scrape_run[content_length]' => header[:content_length],
-          'scrape_run[response_header]' => response.raw_headers.inspect,
+          'scrape_run[response_header]' => raw_response_header.inspect,
           'scrape_run[uri]' => uri,
           'scrape_run[file_path]' => file,
           'scrape_run[git_path]' => relative_git_path,
@@ -64,12 +68,12 @@ class ScrapeRunJob
         }
       else
         {
-          :response_code => response.code,
+          :response_code => response_code,
           :last_modified => header[:last_modified],
           :etag => header[:etag],
           :content_type => header[:content_type],
           :content_length => header[:content_length],
-          :response_header => response.raw_headers.inspect,
+          :response_header => raw_response_header.inspect,
           :uri => uri,
           :file_path => file,
           :git_path => relative_git_path,
@@ -87,10 +91,13 @@ class ScrapeRunJob
       headers[:content_type][/^application\/pdf/] ? true : false
     end
 
-    def headers_text(uri, response)
-      hash = response.headers.merge({:uri => uri,
-          :response_code => response.code,
-          :response_message => response.net_http_res.message})
+    def headers_text(uri, code, response_header)
+      hash = response_header.merge({:uri => uri,
+        :response_code => code
+      })
+      # if response.respond_to?(:net_http_res)
+        # hash = hash.merge({:response_message => response.net_http_res.message})
+      # end
       array = hash.to_a.sort{|a,b| a[0].to_s <=> b[0].to_s}
       ordered_map = YAML::Omap.new(array)
       ordered_map.to_yaml
@@ -109,7 +116,7 @@ class ScrapeRunJob
 
       yield response_text if block # process text before saving
       
-      handle_response_text response, response_text, response_file, body_file, uri
+      handle_response_text response.code, response.raw_headers, response.headers, response_text, response_file, body_file, uri
     end
     
     def diff str1, str2
@@ -123,7 +130,9 @@ class ScrapeRunJob
       exp.path
     end
 
-    def handle_response_text response, response_text, response_file, body_file, uri
+  public
+
+    def handle_response_text response_code, raw_response_header, response_header, response_text, response_file, body_file, uri
       commit_sha = nil
       git_path = GitRepo.relative_git_path(response_file)
 
@@ -136,13 +145,15 @@ class ScrapeRunJob
           puts "diff: #{diff(response_text, last_contents)}"
         end
         headers_file = "#{body_file}.response.yml"
-        GitRepo.write_file(headers_file, headers_text(uri, response))
+        GitRepo.write_file(headers_file, headers_text(uri, response_code, response_header))
         GitRepo.write_file(response_file, response_text)
       end
 
-      update_scrape_run scrape_run_attributes(uri, response, response.headers, body_file, git_path, commit_sha)
+      update_scrape_run scrape_run_attributes(uri, response_code, raw_response_header, response_header, body_file, git_path, commit_sha)
     end
-    
+
+  private
+
     def last_contents
       if @prev_git_commit_sha.blank?
         nil

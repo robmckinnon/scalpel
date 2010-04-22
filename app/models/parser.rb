@@ -48,6 +48,17 @@ class Parser < ActiveRecord::Base
       end
     end
 
+    def write_to_csv values, model, path
+      output = FasterCSV.generate do |csv|
+        attributes = model.morph_attributes
+        csv << attributes.map(&:to_s)
+        values = values.collect do |object|
+           attributes.collect { |attribute| object.send(attribute) }
+        end
+        values.each {|v| csv << v}
+      end
+      GitRepo.write_parsed path, output
+    end
   end
 
   def run

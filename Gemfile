@@ -18,7 +18,7 @@ gem 'fastercsv'
 gem 'pdf-reader'
 gem 'cmess'
 gem 'google-translate'
-# gem 'mechanize'
+gem 'mechanize'
 
 group :development do
   gem 'mysql'

@@ -15,13 +15,13 @@ class WebResource < ActiveRecord::Base
       resource
     end
 
-    def scrape uri, result, &block
+    def scrape uri, result, options={}, &block
       web_resource = find_or_create_by_uri(uri)
       if web_resource.scrape_runs.empty?
         web_resource.scrape_runs = []
         web_resource.save!
       end
-      web_resource.do_scrape &block # synchronous call
+      web_resource.do_scrape(options, &block) # synchronous call
       result.add_working_file(web_resource) if result
       web_resource
     end
@@ -43,9 +43,9 @@ class WebResource < ActiveRecord::Base
   end
   
   # do scrape - synchronous
-  def do_scrape &block
+  def do_scrape options={}, &block
     scrape_run = scrape_runs.create
-    scrape_run.do_run &block
+    scrape_run.do_run(options, &block)
     reload # reloads attributes from database
     nil
   end
@@ -86,8 +86,9 @@ class WebResource < ActiveRecord::Base
       Iconv.conv('utf-8', charset, content)
     else
       content = IO.read(file_path)
-      charset = CMess::GuessEncoding::Automatic.guess(content) 
-      Iconv.conv('utf-8', charset, content)
+      charset = CMess::GuessEncoding::Automatic.guess(content)
+      content = Iconv.conv('utf-8', charset, content) unless charset == 'UNKNOWN'
+      content
     end
   end
 
