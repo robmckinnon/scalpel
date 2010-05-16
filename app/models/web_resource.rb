@@ -9,8 +9,8 @@ class WebResource < ActiveRecord::Base
   has_many :scrape_runs
 
   class << self
-    def scrape_and_add uri, result
-      resource = WebResource.scrape(uri, result)
+    def scrape_and_add uri, result, options={}
+      resource = WebResource.scrape(uri, result, options)
       result.add_resource(resource)
       resource
     end

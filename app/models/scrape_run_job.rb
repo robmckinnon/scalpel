@@ -16,6 +16,12 @@ class ScrapeRunJob
   end
 
   def perform options={}
+    if options[:is_pdf]
+      options.delete(:is_pdf)
+      @is_pdf = true
+    else
+      @is_pdf = false
+    end
     options.merge!({'If-None-Match' => @etag}) if @etag
     options.merge!({'If-Modified-Since' => @last_modified}) if @last_modified
 
@@ -87,8 +93,12 @@ class ScrapeRunJob
       text_file = GitRepo.convert_pdf_file pdf_file      
     end
 
-    def is_pdf? headers
-      headers[:content_type][/^application\/pdf/] ? true : false
+    def is_pdf? headers, uri, body_file
+      if headers[:content_type][/^application\/pdf/] || uri[/pdf$/] || body_file[/pdf$/] || @is_pdf
+        true
+      else
+        false
+      end
     end
 
     def headers_text(uri, code, response_header)
@@ -106,7 +116,7 @@ class ScrapeRunJob
     def http_callback response, uri, &block
       body_file = GitRepo.uri_file_name(uri, response.headers[:content_type], response.headers[:content_disposition])
       puts body_file
-      if is_pdf?(response.headers) || uri[/pdf$/] || body_file[/pdf$/]
+      if is_pdf?(response.headers, uri, body_file)
         response_file = pdf_to_text(body_file, response.to_s)
         response_text = IO.read(response_file)
       else
