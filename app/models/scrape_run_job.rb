@@ -41,6 +41,11 @@ class ScrapeRunJob
     end
   end
 
+  def pdf_to_text pdf_file, response_body
+    GitRepo.write_file pdf_file, response_body
+    text_file = GitRepo.convert_pdf_file pdf_file      
+  end
+
   private
   
     def update_scrape_run data
@@ -86,11 +91,6 @@ class ScrapeRunJob
           :git_commit_sha => commit_sha
         }
       end
-    end
-
-    def pdf_to_text pdf_file, response_body
-      GitRepo.write_file pdf_file, response_body
-      text_file = GitRepo.convert_pdf_file pdf_file      
     end
 
     def is_pdf? headers, uri, body_file
