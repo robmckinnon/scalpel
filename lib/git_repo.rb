@@ -109,7 +109,7 @@ class GitRepo
       file = pdf_file.gsub(' ','\ ')
       run "pdftotext -enc UTF-8 -layout #{file} #{text_file}"
       run "pdftotext -enc UTF-8 #{file} #{text_file.sub(/\.pdf\.txt$/,'.txt')}"
-      run "pdftohtml -xml #{file} #{text_file.sub(/\.pdf\.txt$/,'') }"
+      run "pdftohtml -enc UTF-8 -xml #{file} #{text_file.sub(/\.pdf\.txt$/,'') }"
       text_file
     end
 
